@@ -249,8 +249,8 @@ namespace TYPES
 struct Material 
 {
 	TYPES::Material materialType;
-	vec3 F0;
-	float n;
+	vec3 F0;  // F0 = ( (n-1)^2 + k^2 ) / ( (n+1)^2 + k^2 )
+	float n;  //Femeknel meg uvegnel nem nulla egyebkent szinte mindig 0 meg ebbol adodoan az F0 konstans
 	//CSAK ROUGH MATERIALNAL AZ ALSOK
 	vec3 kd,ks; 
 	float shininess; 
@@ -258,6 +258,16 @@ struct Material
 
 	bool isReflective();
 	bool isRefractive();
+	void calcF0(float k)
+	{
+		F0 = calcF0(n, k);
+	}
+	vec3 calcF0(float nToresmutato, float k)
+	{
+		n = nToresmutato;
+		float f0 = (powf(n - 1, 2) + powf(k, 2)) / (powf(n + 1, 2) + powf(k, 2));
+		F0 = vec3(f0, f0, f0);
+	}
 	vec3 reflect(vec3 inDir, vec3 normal) 
 	{
 		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
@@ -294,11 +304,13 @@ struct Material
 	{
 		vec3 reflRad(0, 0, 0);
 		float cosTheta = dot(normal, lightDir);
-		if (cosTheta < 0) return reflRad;
+		if (cosTheta < 0) 
+			return reflRad;
 		reflRad = inRad * kd * cosTheta;
 		vec3 halfway = (viewDir + lightDir).normalize();
 		float cosDelta = dot(normal, halfway);
-		if (cosDelta < 0) return reflRad;
+		if (cosDelta < 0) 
+			return reflRad;
 		return reflRad + inRad * ks * pow(cosDelta, shininess);
 	}
 };
@@ -373,7 +385,15 @@ class Sphere : public Intersectable {
 public:
 	Sphere(float x, float y, float z, float r)
 		: center(x, y, z), radius(r)
-	{}
+	{
+		material = new Material(); ///TODO felszabaditani
+		material->calcF0(0, 1);
+		
+		//CSAK ROUGH MATERIALNAL AZ ALSOK
+		
+		float shininess;
+
+	}
 	Hit intersect(const Ray& ray)
 	{
 		Hit talalat;
