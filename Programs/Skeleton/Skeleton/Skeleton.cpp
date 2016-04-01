@@ -234,37 +234,92 @@ public:
 	}
 };
 
+namespace TYPES
+{
+	enum Light
+	{
+		Ambient, Direction
+	};
+	enum Material
+	{
+		Rough, Smooth
+	};
+}
 
 struct Material 
 {
+	TYPES::Material materialType;
 	vec3 F0;
 	float n;
-	float kd;
-	float ks;
-	float shine;
+	//CSAK ROUGH MATERIALNAL AZ ALSOK
+	vec3 kd,ks; 
+	float shininess; 
+	//IDAIG
 
 	bool isReflective();
 	bool isRefractive();
-	vec3 reflect();
-	vec3 refract();
-	vec3 Fresnel();
-	vec3 shade();
+	vec3 reflect(vec3 inDir, vec3 normal) 
+	{
+		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+			throw "vec3::reflect() - Csak normalizalt vektorral mukodik a visszaverodes";
+
+		return inDir - normal * dot(normal, inDir) * 2.0f;
+	}
+	vec3 refract(vec3 inDir, vec3 normal) 
+	{
+		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+			throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+
+		float ior = n;
+		float cosa = -dot(normal, inDir);
+		if (cosa < 0)
+		{
+			cosa = -cosa;
+			//normal = -normal; // "-normal" kell ide
+			normal = vec3(-normal.x, -normal.y, -normal.z);
+			ior = 1 / n;
+		}
+		float disc = 1 - (1 - cosa * cosa) / ior / ior;
+		if (disc < 0) return reflect(inDir, normal);
+		return inDir / ior + normal * (cosa / ior - sqrt(disc));
+	}
+	vec3 Fresnel(vec3 inDir, vec3 normal) 
+	{
+		float cosa = fabs(dot(normal, inDir));
+		return F0 + (vec3(1, 1, 1) - F0) * pow(1 - cosa, 5);
+	}
+	//Ezis rough materialnak kell
+	vec3 shade(vec3 normal, vec3 viewDir, vec3 lightDir,
+		vec3 inRad)
+	{
+		vec3 reflRad(0, 0, 0);
+		float cosTheta = dot(normal, lightDir);
+		if (cosTheta < 0) return reflRad;
+		reflRad = inRad * kd * cosTheta;
+		vec3 halfway = (viewDir + lightDir).normalize();
+		float cosDelta = dot(normal, halfway);
+		if (cosDelta < 0) return reflRad;
+		return reflRad + inRad * ks * pow(cosDelta, shininess);
+	}
 };
 
 struct Ray {
-	vec3 kozeppont;
-	vec3 nezetiIrany;
+	vec3 _kozeppont;
+	vec3 _nezetiIrany;
+	Ray(vec3 kozeppont, vec3 nezetiIrany)
+	{
+		_kozeppont = kozeppont;
+		_nezetiIrany = nezetiIrany;
+	}
 };
 
-enum LightType
-{
-	ambient, direction
-};
+
+
 
 struct Light
 {
 	float Lout; // Nem biztos hogy float
-	LightType lightType; //Ambiens vagy irány fényforrás
+	TYPES::Light lightType; //Ambiens vagy irány fényforrás
 	vec3 getLightDir(); ///TODO
 	vec3 getInRad(); ///TODO
 	vec3 getDist(); ///TODO
@@ -297,19 +352,18 @@ struct Hit
 		t = -1;
 	}
 
-	Hit firstIntersect(Ray ray) {
-		Hit bestHit;
-		for (unsigned i = 0; i < objects.size(); i++)
-		{
-			Intersectable * obj = objects[i];
-			Hit hit = obj->intersect(ray); //  hit.t < 0 if no intersection
-			if (hit.t > 0 && (bestHit.t < 0 || hit.t < bestHit.t)) 	bestHit = hit;
-		}
-		return bestHit;
-	}
-
 };
 
+Hit firstIntersect(Ray ray) {
+	Hit bestHit;
+	for (unsigned i = 0; i < objects.size(); i++)
+	{
+		Intersectable * obj = objects[i];
+		Hit hit = obj->intersect(ray); //  hit.t < 0 if no intersection
+		if (hit.t > 0 && (bestHit.t < 0 || hit.t < bestHit.t)) 	bestHit = hit;
+	}
+	return bestHit;
+}
 
 class Sphere : public Intersectable {
 	vec3 center;
@@ -429,6 +483,17 @@ struct Scene
 		//		increment depth;
 		//	} until reflection factor is 0 or maximum depth is reached;
 		//}
+		static vec4 elkeszultKep[windowWidth * windowHeight];
+		for (int x = 0; x < windowWidth; x++) {
+			for (int y = 0; y < windowHeight; y++) {
+				elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0
+				vec3 vegsoSzin = vec3(0,0,0);
+				///TODO repeat
+				{
+					//Hit legkozelebbiTargy = firstIntersect(ray);
+				}
+			}
+		}
 	}
 	
 	
