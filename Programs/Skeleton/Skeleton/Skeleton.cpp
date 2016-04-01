@@ -49,11 +49,12 @@
 #include <GL/freeglut.h>	// must be downloaded unless you have an Apple
 #endif
 
+#include <vector>
 const unsigned int windowWidth = 600, windowHeight = 600;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Innentol modosithatod...
-
+using namespace std;
 // OpenGL major and minor versions
 int majorVersion = 3, minorVersion = 0;
 
@@ -234,6 +235,108 @@ public:
 };
 
 
+struct Material 
+{
+	vec3 F0;
+	float n;
+	float kd;
+	float ks;
+	float shine;
+
+	bool isReflective();
+	bool isRefractive();
+	vec3 reflect();
+	vec3 refract();
+	vec3 Fresnel();
+	vec3 shade();
+};
+
+struct Ray {
+	vec3 kozeppont;
+	vec3 nezetiIrany;
+};
+
+enum LightType
+{
+	ambient, direction
+};
+
+struct Light
+{
+	float Lout; // Nem biztos hogy float
+	LightType lightType; //Ambiens vagy irány fényforrás
+	vec3 getLightDir(); ///TODO
+	vec3 getInRad(); ///TODO
+	vec3 getDist(); ///TODO
+};
+
+struct Camera
+{
+	vec3 eye;
+	vec3 lookat;
+	vec3 up;
+	vec3 right;
+
+	//Ray GetRay(); ///TODO
+};
+struct Hit;
+struct Intersectable
+{
+	Material* material;
+	virtual Hit intersect(const Ray& ray) = 0;
+};
+vector<Intersectable*> objects;
+struct Hit
+{
+	float t;
+	vec3 position;
+	vec3 normal;
+	Material* material;
+	Hit()
+	{
+		t = -1;
+	}
+
+	Hit firstIntersect(Ray ray) {
+		Hit bestHit;
+		for (unsigned i = 0; i < objects.size(); i++)
+		{
+			Intersectable * obj = objects[i];
+			Hit hit = obj->intersect(ray); //  hit.t < 0 if no intersection
+			if (hit.t > 0 && (bestHit.t < 0 || hit.t < bestHit.t)) 	bestHit = hit;
+		}
+		return bestHit;
+	}
+
+};
+
+
+class Sphere : public Intersectable {
+	vec3 center;
+	float radius;
+public:
+	//Hit intersect(const Ray& ray)
+	//{
+	//	;
+	//}
+};
+
+//vec3 trace(Ray ray) {
+//
+//	Hit hit = firstIntersect(ray);
+//	if (hit.t < 0) return La; // nothing
+//	vec3 outRadiance = hit.material->ka * La;
+//	for (each light source l) {
+//		Ray shadowRay(r + N, Ll);
+//		Hit shadowHit = firstIntersect(shadowRay);
+//		if (shadowHit.t < 0 || shadowHit.t > | r - yl | )
+//			outRadiance += hit.material->shade(N, V, Ll, Lel);
+//	}
+//	return outRadiance;
+//}
+
+
+
 
 
 struct vec4 {
@@ -290,6 +393,46 @@ public:
 
 // The virtual world: single quad
 FullScreenTexturedQuad fullScreenTexturedQuad;
+
+struct Scene
+{
+	
+	void addObject(Material* material)
+	{
+
+	}
+	void createImage()
+	{
+		//for each pixel of the screen
+		//{
+		//	Final color = 0;
+		//	Ray = { starting point, direction };
+		//	Repeat
+		//	{
+		//		5
+		//		for each object in the scene
+		//		{
+		//			determine closest ray object / intersection;
+		//		}
+		//			if intersection exists
+		//			{
+		//				for each light in the scene
+		//				{
+		//					if the light is not in shadow of another object
+		//					{
+		//						add this light contribution to computed color;
+		//					}
+		//				}
+		//			}
+		//		Final color = Final color + computed color * previous reflection factor;
+		//		reflection factor = reflection factor * surface reflection property;
+		//		increment depth;
+		//	} until reflection factor is 0 or maximum depth is reached;
+		//}
+	}
+	
+	
+};
 
 // Initialization, create an OpenGL context
 void onInitialization() {
