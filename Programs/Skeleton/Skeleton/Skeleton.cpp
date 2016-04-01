@@ -37,8 +37,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <vector>
-
 #if defined(__APPLE__)
 #include <GLUT/GLUT.h>
 #include <OpenGL/gl3.h>
@@ -96,15 +94,12 @@ const char *vertexSource = R"(
 	#version 130
     precision highp float;
 
-	uniform mat4 MVP;			// Model-View-Projection matrix in row-major format
+		in vec2 vertexPosition;		// variable input from Attrib Array selected by glBindAttribLocation
+	out vec2 texcoord;			// output attribute: texture coordinate
 
-	in vec2 vertexPosition;		// variable input from Attrib Array selected by glBindAttribLocation
-	in vec3 vertexColor;	    // variable input from Attrib Array selected by glBindAttribLocation
-	out vec3 color;				// output attribute
-
-	void main() {
-		color = vertexColor;														// copy color from input to output
-		gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0, 1) * MVP; 		// transform to clipping space
+		void main() {
+		texcoord = (vertexPosition + vec2(1, 1))/2;							// -1,1 to 0,1
+		gl_Position = vec4(vertexPosition.x, vertexPosition.y, 0, 1); 		// transform to clipping space
 	}
 )";
 
@@ -113,243 +108,82 @@ const char *fragmentSource = R"(
 	#version 130
     precision highp float;
 
-	in vec3 color;				// variable input: interpolated color of vertex shader
+		uniform sampler2D textureUnit;
+	in  vec2 texcoord;			// interpolated texture coordinates
 	out vec4 fragmentColor;		// output that goes to the raster memory as told by glBindFragDataLocation
 
-	void main() {
-		fragmentColor = vec4(color, 1); // extend RGB to RGBA
+		void main() {
+		fragmentColor = texture(textureUnit, texcoord); 
 	}
 )";
 
-// row-major matrix 4x4
-struct mat4 {
-	float m[4][4];
-public:
-	mat4() {}
-	mat4(float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33) {
-		m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
-		m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
-		m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
-		m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
-	}
 
-	mat4 operator*(const mat4& right) {
-		mat4 result;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				result.m[i][j] = 0;
-				for (int k = 0; k < 4; k++) result.m[i][j] += m[i][k] * right.m[k][j];
-			}
-		}
-		return result;
-	}
-	operator float*() { return &m[0][0]; }
-};
-
-
-// 3D point in homogeneous coordinates
 struct vec4 {
 	float v[4];
 
 	vec4(float x = 0, float y = 0, float z = 0, float w = 1) {
 		v[0] = x; v[1] = y; v[2] = z; v[3] = w;
 	}
-
-	vec4 operator*(const mat4& mat) {
-		vec4 result;
-		for (int j = 0; j < 4; j++) {
-			result.v[j] = 0;
-			for (int i = 0; i < 4; i++) result.v[j] += v[i] * mat.m[i][j];
-		}
-		return result;
-	}
 };
 
-// 2D camera
-struct Camera {
-	float wCx, wCy;	// center in world coordinates
-	float wWx, wWy;	// width and height in world coordinates
-public:
-	Camera() {
-		Animate(0);
-	}
-
-	mat4 V() { // view matrix: translates the center to the origin
-		return mat4(1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			-wCx, -wCy, 0, 1);
-	}
-
-	mat4 P() { // projection matrix: scales it to be a square of edge length 2
-		return mat4(2 / wWx, 0, 0, 0,
-			0, 2 / wWy, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
-	}
-
-	mat4 Vinv() { // inverse view matrix
-		return mat4(1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			wCx, wCy, 0, 1);
-	}
-
-	mat4 Pinv() { // inverse projection matrix
-		return mat4(wWx / 2, 0, 0, 0,
-			0, wWy / 2, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1);
-	}
-
-	void Animate(float t) {
-		wCx = 0; // 10 * cosf(t);
-		wCy = 0;
-		wWx = 20;
-		wWy = 20;
-	}
-};
-
-// 2D camera
-Camera camera;
 
 // handle of the shader program
 unsigned int shaderProgram;
 
-class Triangle {
-	unsigned int vao;	// vertex array object id
-	float sx, sy;		// scaling
-	float wTx, wTy;		// translation
+class FullScreenTexturedQuad {
+	unsigned int vao, textureId;	// vertex array object id and texture id
 public:
-	Triangle() {
-		Animate(0);
-	}
-
-	void Create() {
+	void Create(vec4 image[windowWidth * windowHeight]) {
 		glGenVertexArrays(1, &vao);	// create 1 vertex array object
 		glBindVertexArray(vao);		// make it active
 
-		unsigned int vbo[2];		// vertex buffer objects
-		glGenBuffers(2, &vbo[0]);	// Generate 2 vertex buffer objects
+		unsigned int vbo;		// vertex buffer objects
+		glGenBuffers(1, &vbo);	// Generate 1 vertex buffer objects
 
-		// vertex coordinates: vbo[0] -> Attrib Array 0 -> vertexPosition of the vertex shader
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // make it active, it is an array
-		static float vertexCoords[] = { -8, -8, -6, 10, 8, -2 };	// vertex data on the CPU
-		glBufferData(GL_ARRAY_BUFFER,      // copy to the GPU
-			sizeof(vertexCoords),  // number of the vbo in bytes
-			vertexCoords,		   // address of the data array on the CPU
-			GL_STATIC_DRAW);	   // copy to that part of the memory which is not modified 
-		// Map Attribute Array 0 to the current bound vertex buffer (vbo[0])
+								// vertex coordinates: vbo[0] -> Attrib Array 0 -> vertexPosition of the vertex shader
+		glBindBuffer(GL_ARRAY_BUFFER, vbo); // make it active, it is an array
+		static float vertexCoords[] = { -1, -1,   1, -1,  -1, 1,
+			1, -1,   1,  1,  -1, 1 };	// two triangles forming a quad
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexCoords), vertexCoords, GL_STATIC_DRAW);	   // copy to that part of the memory which is not modified 
+																							   // Map Attribute Array 0 to the current bound vertex buffer (vbo[0])
 		glEnableVertexAttribArray(0);
-		// Data organization of Attribute Array 0 
-		glVertexAttribPointer(0,			// Attribute Array 0
-			2, GL_FLOAT,  // components/attribute, component type
-			GL_FALSE,		// not in fixed point format, do not normalized
-			0, NULL);     // stride and offset: it is tightly packed
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);     // stride and offset: it is tightly packed
 
-		// vertex colors: vbo[1] -> Attrib Array 1 -> vertexColor of the vertex shader
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // make it active, it is an array
-		static float vertexColors[] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };	// vertex data on the CPU
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexColors), vertexColors, GL_STATIC_DRAW);	// copy to the GPU
+																	  // Create objects by setting up their vertex data on the GPU
+		glGenTextures(1, &textureId);  				// id generation
+		glBindTexture(GL_TEXTURE_2D, textureId);    // binding
 
-		// Map Attribute Array 1 to the current bound vertex buffer (vbo[1])
-		glEnableVertexAttribArray(1);  // Vertex position
-		// Data organization of Attribute Array 1
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL); // Attribute Array 1, components/attribute, component type, normalize?, tightly packed
-	}
-
-	void Animate(float t) {
-		sx = 1; // *sinf(t);
-		sy = 1; // *cosf(t);
-		wTx = 0; // 4 * cosf(t / 2);
-		wTy = 0; // 4 * sinf(t / 2);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, image); // To GPU
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // sampling
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
 	void Draw() {
-		mat4 M(sx, 0, 0, 0,
-			0, sy, 0, 0,
-			0, 0, 0, 0,
-			wTx, wTy, 0, 1); // model matrix
-
-		mat4 MVPTransform = M * camera.V() * camera.P();
-
-		// set GPU uniform matrix variable MVP with the content of CPU variable MVPTransform
-		int location = glGetUniformLocation(shaderProgram, "MVP");
-		if (location >= 0) glUniformMatrix4fv(location, 1, GL_TRUE, MVPTransform); // set uniform variable MVP to the MVPTransform
-		else printf("uniform MVP cannot be set\n");
-
 		glBindVertexArray(vao);	// make the vao and its vbos active playing the role of the data source
-		glDrawArrays(GL_TRIANGLES, 0, 3);	// draw a single triangle with vertices defined in vao
-	}
-};
-
-class LineStrip {
-	GLuint vao, vbo;        // vertex array object, vertex buffer object
-	float  vertexData[100]; // interleaved data of coordinates and colors
-	int    nVertices;       // number of vertices
-public:
-	LineStrip() {
-		nVertices = 0;
-	}
-	void Create() {
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		glGenBuffers(1, &vbo); // Generate 1 vertex buffer object
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		// Enable the vertex attribute arrays
-		glEnableVertexAttribArray(0);  // attribute array 0
-		glEnableVertexAttribArray(1);  // attribute array 1
-		// Map attribute array 0 to the vertex data of the interleaved vbo
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(0)); // attribute array, components/attribute, component type, normalize?, stride, offset
-		// Map attribute array 1 to the color data of the interleaved vbo
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
-	}
-
-	void AddPoint(float cX, float cY) {
-		if (nVertices >= 20) return;
-
-		vec4 wVertex = vec4(cX, cY, 0, 1) * camera.Pinv() * camera.Vinv();
-		// fill interleaved data
-		vertexData[5 * nVertices] = wVertex.v[0];
-		vertexData[5 * nVertices + 1] = wVertex.v[1];
-		vertexData[5 * nVertices + 2] = 1; // red
-		vertexData[5 * nVertices + 3] = 1; // green
-		vertexData[5 * nVertices + 4] = 0; // blue
-		nVertices++;
-		// copy data to the GPU
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, nVertices * 5 * sizeof(float), vertexData, GL_DYNAMIC_DRAW);
-	}
-
-	void Draw() {
-		if (nVertices > 0) {
-			mat4 VPTransform = camera.V() * camera.P();
-
-			int location = glGetUniformLocation(shaderProgram, "MVP");
-			if (location >= 0) glUniformMatrix4fv(location, 1, GL_TRUE, VPTransform);
-			else printf("uniform MVP cannot be set\n");
-
-			glBindVertexArray(vao);
-			glDrawArrays(GL_LINE_STRIP, 0, nVertices);
+		int location = glGetUniformLocation(shaderProgram, "textureUnit");
+		if (location >= 0) {
+			glUniform1i(location, 0);		// texture sampling unit is TEXTURE0
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, textureId);	// connect the texture to the sampler
 		}
+		glDrawArrays(GL_TRIANGLES, 0, 6);	// draw two triangles forming a quad
 	}
 };
 
-// The virtual world: collection of two objects
-Triangle triangle;
-LineStrip lineStrip;
+// The virtual world: single quad
+FullScreenTexturedQuad fullScreenTexturedQuad;
 
 // Initialization, create an OpenGL context
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 
-	// Create objects by setting up their vertex data on the GPU
-	triangle.Create();
-	lineStrip.Create();
+	static vec4 background[windowWidth * windowHeight];
+	for (int x = 0; x < windowWidth; x++) {
+		for (int y = 0; y < windowHeight; y++) {
+			background[y * windowWidth + x] = vec4((float)x / windowWidth, (float)y / windowHeight, 0, 1);
+		}
+	}
+	fullScreenTexturedQuad.Create(background);
 
 	// Create vertex shader from string
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -382,12 +216,11 @@ void onInitialization() {
 
 	// Connect Attrib Arrays to input variables of the vertex shader
 	glBindAttribLocation(shaderProgram, 0, "vertexPosition"); // vertexPosition gets values from Attrib Array 0
-	glBindAttribLocation(shaderProgram, 1, "vertexColor");    // vertexColor gets values from Attrib Array 1
 
-	// Connect the fragmentColor to the frame buffer memory
+															  // Connect the fragmentColor to the frame buffer memory
 	glBindFragDataLocation(shaderProgram, 0, "fragmentColor");	// fragmentColor goes to the frame buffer memory
 
-	// program packaging
+																// program packaging
 	glLinkProgram(shaderProgram);
 	checkLinking(shaderProgram);
 	// make this program run
@@ -403,9 +236,7 @@ void onExit() {
 void onDisplay() {
 	glClearColor(0, 0, 0, 0);							// background color 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the screen
-
-	triangle.Draw();
-	lineStrip.Draw();
+	fullScreenTexturedQuad.Draw();
 	glutSwapBuffers();									// exchange the two buffers
 }
 
@@ -422,10 +253,6 @@ void onKeyboardUp(unsigned char key, int pX, int pY) {
 // Mouse click event
 void onMouse(int button, int state, int pX, int pY) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {  // GLUT_LEFT_BUTTON / GLUT_RIGHT_BUTTON and GLUT_DOWN / GLUT_UP
-		float cX = 2.0f * pX / windowWidth - 1;	// flip y axis
-		float cY = 1.0f - 2.0f * pY / windowHeight;
-		lineStrip.AddPoint(cX, cY);
-		glutPostRedisplay();     // redraw
 	}
 }
 
@@ -436,10 +263,6 @@ void onMouseMotion(int pX, int pY) {
 // Idle event indicating that some time elapsed: do animation here
 void onIdle() {
 	long time = glutGet(GLUT_ELAPSED_TIME); // elapsed time since the start of the program
-	float sec = time / 1000.0f;				// convert msec to sec
-	camera.Animate(sec);					// animate the camera
-	triangle.Animate(sec);					// animate the triangle object
-	glutPostRedisplay();					// redraw the scene
 }
 
 // Idaig modosithatod...
