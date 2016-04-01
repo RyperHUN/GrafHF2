@@ -127,13 +127,13 @@ struct vec3
 	vec3(float x0 = 0, float y0 = 0, float z0 = 0) { x = x0; y = y0; z = z0; }
 	vec3 operator*(float a) { return vec3(x * a, y * a, z * a); }
 
-	vec3 operator+(const vec3& v) {
+	vec3 operator+(const vec3& v) const {
 		return vec3(x + v.x, y + v.y, z + v.z);
 	}
-	vec3 operator-(const vec3& v) {
+	vec3 operator-(const vec3& v) const {
 		return vec3(x - v.x, y - v.y, z - v.z);
 	}
-	vec3 operator*(const vec3& v) {
+	vec3 operator*(const vec3& v) const {
 		return vec3(x * v.x, y * v.y, z * v.z);
 	}
 	vec3 operator/(const float oszto)
@@ -304,7 +304,7 @@ struct Material
 };
 
 struct Ray {
-	vec3 _kozeppont;
+	vec3 _kozeppont; //eye al egyezik a kamerába
 	vec3 _nezetiIrany;
 	Ray(vec3 kozeppont, vec3 nezetiIrany)
 	{
@@ -327,11 +327,13 @@ struct Light
 
 struct Camera
 {
-	vec3 eye;
+	vec3 eye; // Szem pozició, ahonnan a kamera néz???
 	vec3 lookat;
 	vec3 up;
 	vec3 right;
 
+	//TODO X-Y koordinátát beadsz neki ( Pixel pont a képernyőn, 600x600 ason)
+	//Es megmondja hogy merre nez a sugar!
 	//Ray GetRay(); ///TODO
 };
 struct Hit;
@@ -351,7 +353,6 @@ struct Hit
 	{
 		t = -1;
 	}
-
 };
 
 Hit firstIntersect(Ray ray) {
@@ -360,7 +361,8 @@ Hit firstIntersect(Ray ray) {
 	{
 		Intersectable * obj = objects[i];
 		Hit hit = obj->intersect(ray); //  hit.t < 0 if no intersection
-		if (hit.t > 0 && (bestHit.t < 0 || hit.t < bestHit.t)) 	bestHit = hit;
+		if (hit.t > 0 && (bestHit.t < 0 || hit.t < bestHit.t)) 
+			bestHit = hit;
 	}
 	return bestHit;
 }
@@ -369,10 +371,40 @@ class Sphere : public Intersectable {
 	vec3 center;
 	float radius;
 public:
-	//Hit intersect(const Ray& ray)
-	//{
-	//	;
-	//}
+	Sphere(float x, float y, float z, float r)
+		: center(x, y, z), radius(r)
+	{}
+	Hit intersect(const Ray& ray)
+	{
+		Hit talalat;
+		///TODO Rakerdezni
+		//Kovetkezo feltetelezessel elve: eye = ray._kozeppont, v = ray._nezetiIrany
+		float a = (dot(ray._nezetiIrany,ray._nezetiIrany));
+		float b = 2*(dot((ray._kozeppont - center), ray._nezetiIrany));
+		float c = dot((ray._kozeppont - center), (ray._kozeppont - center)) - powf(radius, 2);
+		//Masodfoku egyenlet parameterei
+		float diszkriminans = powf(b, 2) - 4 * a * c;
+		if (diszkriminans < 0) // nincs talalat
+			return talalat; //Defaultbol -1 tehat nincs talalat
+		
+		float x1 = (-b + sqrtf(diszkriminans)) / (2 * a);
+		float x2 = (+b + sqrtf(diszkriminans)) / (2 * a);
+		///TODO x1, x2 itt mi lesz???? - Talan a tavolsag a szemtol a metszespontal
+		///TODO HIT.Position.
+		if (x1 > x2)
+		{
+			talalat.t = x1;
+			talalat.position = ray._kozeppont + ray._nezetiIrany * talalat.t;
+			return talalat;
+		}
+		else
+		{
+			talalat.t = x2;
+			talalat.position = ray._kozeppont + ray._nezetiIrany * talalat.t;
+			return talalat;
+		}
+
+	}
 };
 
 //vec3 trace(Ray ray) {
@@ -502,6 +534,9 @@ struct Scene
 // Initialization, create an OpenGL context
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
+
+	Sphere* sphere = new Sphere(0, 0, -1, 0.5); ///TODO felszabaditani.
+	objects.push_back(sphere);
 
 	static vec4 background[windowWidth * windowHeight];
 	for (int x = 0; x < windowWidth; x++) {
