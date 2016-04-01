@@ -116,6 +116,100 @@ const char *fragmentSource = R"(
 		fragmentColor = texture(textureUnit, texcoord); 
 	}
 )";
+//===================================================== INNENTOL VAN ERDEKES DOLOG =================================================//
+
+
+struct vec3
+{
+	float x, y, z;
+	
+	vec3(float x0 = 0, float y0 = 0, float z0 = 0) { x = x0; y = y0; z = z0; }
+	vec3 operator*(float a) { return vec3(x * a, y * a, z * a); }
+
+	vec3 operator+(const vec3& v) {
+		return vec3(x + v.x, y + v.y, z + v.z);
+	}
+	vec3 operator-(const vec3& v) {
+		return vec3(x - v.x, y - v.y, z - v.z);
+	}
+	vec3 operator*(const vec3& v) {
+		return vec3(x * v.x, y * v.y, z * v.z);
+	}
+	vec3 operator/(const float oszto)
+	{
+		if (oszto == 0)
+			throw "vec3::operator/() - 0 val osztas";
+		return vec3(x / oszto, y / oszto, z / oszto);
+	}
+	float Length() { return sqrtf(x * x + y * y + z * z); }
+};
+
+float dot(const vec3& v1, const vec3& v2) {
+	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
+}
+
+vec3 cross(const vec3& v1, const vec3& v2) {
+	return vec3(v1.y * v2.z - v1.z * v2.y,
+		        (v1.z * v2.x) - (v1.x * v2.z),
+		        v1.x * v2.y - v1.y * v2.x );
+}
+//FONTOS CSAK EGYSEG VEKTOROKKAL MUKODIK
+//Visszaverődési irány határozza meg!
+//vec3 reflect(vec3 inDir, vec3 normal)
+//{
+	//if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+	//	throw "vec3::reflect() - Csak normalizalt vektorral mukodik a visszaverodes";
+//	return inDir - normal * dot(normal, inDir) *2.0f;
+//}
+
+//FONTOS CSAK EGYSEG VEKTOROKKAL MUKODIK
+//Törési irányt határozza meg!
+///TODO SmoothMaterial class-ba belerakni.
+//vec3 refract(vec3 inDir, vec3 normal) {
+//	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+//		throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+//	float ior = n;
+//	float cosa = -dot(normal, inDir);
+//	if (cosa < 0) { cosa = -cosa; normal = -normal; ior = 1 / n; }
+//	float disc = 1 - (1 - cosa * cosa) / ior / ior;
+//	if (disc < 0) return reflect(inDir, normal);
+//	return inDir / ior + normal * (cosa / ior - sqrt(disc));
+//}
+
+class SmoothMaterial {
+	vec3   F0;	// F0
+	float  n;	// n
+public:
+	vec3 reflect(vec3 inDir, vec3 normal) {
+		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+			throw "vec3::reflect() - Csak normalizalt vektorral mukodik a visszaverodes";
+
+		return inDir - normal * dot(normal, inDir) * 2.0f;
+	}
+	vec3 refract(vec3 inDir, vec3 normal) {
+		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+			throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+
+		float ior = n;
+		float cosa = -dot(normal, inDir);
+		if (cosa < 0) 
+		{ 
+			cosa = -cosa;
+			//normal = -normal; // "-normal" kell ide
+			normal = vec3(-normal.x, -normal.y, -normal.z);
+			ior = 1 / n; 
+}
+		float disc = 1 - (1 - cosa * cosa) / ior / ior;
+		if (disc < 0) return reflect(inDir, normal);
+		return inDir / ior + normal * (cosa / ior - sqrt(disc));
+	}
+	vec3 Fresnel(vec3 inDir, vec3 normal) {
+		float cosa = fabs(dot(normal, inDir));
+		return F0 + (vec3(1, 1, 1) - F0) * pow(1 - cosa, 5);
+	}
+};
+
+
 
 
 struct vec4 {
@@ -180,7 +274,9 @@ void onInitialization() {
 	static vec4 background[windowWidth * windowHeight];
 	for (int x = 0; x < windowWidth; x++) {
 		for (int y = 0; y < windowHeight; y++) {
-			background[y * windowWidth + x] = vec4((float)x / windowWidth, (float)y / windowHeight, 0, 1);
+			background[y * windowWidth + x] = vec4(0.5, (float)1, 0, 1);
+			if(abs(x-y) < 10)
+				background[y * windowWidth + x] = vec4(0, (float)0, 1, 1);
 		}
 	}
 	fullScreenTexturedQuad.Create(background);
