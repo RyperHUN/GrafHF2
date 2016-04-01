@@ -142,6 +142,12 @@ struct vec3
 		return vec3(x / oszto, y / oszto, z / oszto);
 	}
 	float Length() { return sqrtf(x * x + y * y + z * z); }
+	///TODO nem biztos hogy jó
+	vec3 normalize()
+	{
+		float meret = Length();
+		return vec3(x / meret, y / meret, z / meret);
+	}
 };
 
 float dot(const vec3& v1, const vec3& v2) {
@@ -206,6 +212,24 @@ public:
 	vec3 Fresnel(vec3 inDir, vec3 normal) {
 		float cosa = fabs(dot(normal, inDir));
 		return F0 + (vec3(1, 1, 1) - F0) * pow(1 - cosa, 5);
+	}
+};
+
+class RoughMaterial {
+	vec3 kd, ks;
+	float  shininess;
+public:
+	vec3 shade(vec3 normal, vec3 viewDir, vec3 lightDir,
+		vec3 inRad)
+	{
+		vec3 reflRad(0, 0, 0);
+		float cosTheta = dot(normal, lightDir);
+		if (cosTheta < 0) return reflRad;
+		reflRad = inRad * kd * cosTheta;
+		vec3 halfway = (viewDir + lightDir).normalize();
+		float cosDelta = dot(normal, halfway);
+		if (cosDelta < 0) return reflRad;
+		return reflRad + inRad * ks * pow(cosDelta, shininess);
 	}
 };
 
@@ -316,7 +340,8 @@ void onInitialization() {
 															  // Connect the fragmentColor to the frame buffer memory
 	glBindFragDataLocation(shaderProgram, 0, "fragmentColor");	// fragmentColor goes to the frame buffer memory
 
-																// program packaging
+															// program packaging
+
 	glLinkProgram(shaderProgram);
 	checkLinking(shaderProgram);
 	// make this program run
