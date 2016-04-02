@@ -282,6 +282,12 @@ class SmoothMaterial : public Material{
 	vec3 n;	// n
 	vec3 k; // Ezt igazabol nem kotelezo eltarolni
 public:
+	SmoothMaterial(vec3 nToresmutato, vec3 kKioltasiTenyezo)
+	{
+		materialType = TYPES::Smooth;
+		n = nToresmutato;
+		k = kKioltasiTenyezo;
+	}
 	vec3 reflect(vec3 inDir, vec3 normal) {
 		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
 			throw "vec3::reflect() - Csak normalizalt vektorral mukodik a visszaverodes";
@@ -336,11 +342,13 @@ public:
 	{
 		vec3 reflRad(0, 0, 0);
 		float cosTheta = dot(normal, lightDir);
-		if (cosTheta < 0) return reflRad;
+		if (cosTheta < 0) 
+			return reflRad;
 		reflRad = inRad * kd * cosTheta;
 		vec3 halfway = (viewDir + lightDir).normalize();
 		float cosDelta = dot(normal, halfway);
-		if (cosDelta < 0) return reflRad;
+		if (cosDelta < 0) 
+			return reflRad;
 		return reflRad + inRad * ks * pow(cosDelta, shininess);
 	}
 };
@@ -359,10 +367,11 @@ struct Ray {
 
 struct Light
 {
-	vec3 position;
-	float Lout; // Nem biztos hogy float
-	vec3 LightColor;
 	TYPES::Light lightType; //Ambiens vagy irány fényforrás
+	vec3 position;
+	//float Lout; // Nem biztos hogy float
+	float intensity;
+	vec3 LightColor;
 	vec3 getLightDir(); ///TODO
 	vec3 getInRad(); ///TODO
 	float getSquareDist(vec3 intersectPos)
@@ -391,6 +400,26 @@ struct AmbientLight : public Light
 	}
 };
 
+struct DirectionLight : public Light
+{
+	vec3 lightDirection;
+	DirectionLight(vec3 NewLightColor,vec3 dir,vec3 pos)
+	{
+		lightType = TYPES::Direction;
+		lightDirection = dir;
+		LightColor = NewLightColor;
+	}
+	vec3 getDecrasedColor(vec3 intersectPos)
+	{
+		float tavolsagNegyzet = getSquareDist(intersectPos);
+
+		vec3 csokkentettColor(LightColor.x / tavolsagNegyzet, LightColor.y / tavolsagNegyzet, LightColor.z / tavolsagNegyzet);
+		return csokkentettColor;
+
+	}
+};
+
+DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), vec3(20, 0, 0));
 AmbientLight ambiensFeny(vec3(1, 1, 1)); // Igy elmeletileg feher lesz
 
 struct Camera
