@@ -367,7 +367,7 @@ AmbientLight ambiensFeny(vec3(1, 1, 1)); // Igy elmeletileg feher lesz
 struct Camera
 {
 	vec3 eye; // Szem pozició, ahonnan a kamera néz???
-	vec3 lookat;
+	vec3 planePosition; //Megmondja merre nez a kamera, vagyis hogy mennyire van messze a "vaszon" amin a pixelek vannak
 	vec3 up;
 	vec3 right;
 
@@ -530,13 +530,14 @@ FullScreenTexturedQuad fullScreenTexturedQuad;
 
 struct Scene
 {
-	
-	void addObject(Material* material)
+	Camera camera;
+	void addObject(Intersectable* intersectable)
 	{
-
+		////TODO adja hozzá object tombhoz
 	}
 	void createImage()
 	{
+		setCamera();
 		//for each pixel of the screen
 		//{
 		//	Final color = 0;
@@ -567,6 +568,7 @@ struct Scene
 		for (int x = 0; x < windowWidth; x++) {
 			for (int y = 0; y < windowHeight; y++) {
 				elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0
+				//Ray ray = camera.getRay(x,y);
 				vec3 vegsoSzin = vec3(0,0,0);
 				///TODO repeat
 				{
@@ -575,24 +577,33 @@ struct Scene
 			}
 		}
 	}
-	
-	
+	///TODO atnezni parametrizalni
+	void setCamera()
+	{
+		camera.eye = vec3(0, 0, 1);
+		camera.planePosition = vec3(0, 0, -1);
+		camera.right = vec3(1, 0, 0);
+		camera.up = cross(camera.right,camera.planePosition);
+	}
 };
+Scene scene;
 
 // Initialization, create an OpenGL context
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 
 	//Feladatban specifikalt adatok
-	vec3 EzustN(0.14, 0.16, 0.13);
-	vec3 EzustK(4.1, 2.3, 3.1);
-	vec3 AranyN(0.17, 0.35, 1.5);
-	vec3 AranyK(3.1, 2.7, 1.9);
+	vec3 EzustN(0.14f, 0.16f, 0.13f);
+	vec3 EzustK(4.1f, 2.3f, 3.1f);
+	vec3 AranyN(0.17f, 0.35f, 1.5f);
+	vec3 AranyK(3.1f, 2.7f, 1.9f);
 
 	vec3 AranyColor(1, 0.8431372549f, 0); // Arany szine
 	Sphere* sphere = new Sphere(0, 0, -1, 0.5); ///TODO felszabaditani.
 	sphere->material->calcF0(AranyN,AranyK);
 	objects.push_back(sphere);
+
+	scene.createImage();
 
 	static vec4 background[windowWidth * windowHeight];
 	for (int x = 0; x < windowWidth; x++) {
