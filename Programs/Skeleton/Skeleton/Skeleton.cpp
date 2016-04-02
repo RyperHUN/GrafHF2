@@ -344,12 +344,18 @@ struct Ray {
 
 struct Light
 {
+	vec3 position;
 	float Lout; // Nem biztos hogy float
 	vec3 LightColor;
 	TYPES::Light lightType; //Ambiens vagy irány fényforrás
 	vec3 getLightDir(); ///TODO
 	vec3 getInRad(); ///TODO
-	vec3 getDist(); ///TODO
+	float getSquareDist(vec3 intersectPos)
+	{
+		vec3 tavolsagVec = position - intersectPos;
+		float tavolsag = tavolsagVec.Length();
+		return powf(tavolsag, 2);
+	}
 	Light() {}
 };
 
@@ -359,6 +365,14 @@ struct AmbientLight : public Light
 	{
 		lightType = TYPES::Ambient;
 		LightColor = NewLightColor;
+	}
+	vec3 getDecrasedColor(vec3 intersectPos)
+	{
+		float tavolsagNegyzet = getSquareDist(intersectPos);
+
+		vec3 csokkentettColor(LightColor.x / tavolsagNegyzet, LightColor.y / tavolsagNegyzet, LightColor.z / tavolsagNegyzet);
+		return csokkentettColor;
+
 	}
 };
 
@@ -473,13 +487,16 @@ vec3 trace(Ray ray) {
 	if (hit.t < 0)  ///TODO azzal a feltetelezessel elve hogy La = ambiensFeny szine
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 	vec3 outRadiance = hit.material->color * ambiensFeny.LightColor;
+	///TODO Kovetkezo sorba be van epitve hogy gyengul a fenye a tavolsaggal!
+	//vec3 outRadiance = hit.material->color * ambiensFeny.getDecrasedColor(hit.position);
+
 	//for (each light source l) {
 	//	///TODO ez csak arnyeknak kell
 	//	///TODO ShadowRay nel a dian megfelelo iranyba menjen a dolog ( ez kell a shade nek is ) 
 	//	//Ray shadowRay(r + N, Ll);  
 	//	//Hit shadowHit = firstIntersect(shadowRay);
 	//	//if (shadowHit.t < 0 || shadowHit.t > | r - yl | )
-	//		outRadiance = outRadiance + hit.material->shade(N, V, Ll, Lel);
+			//outRadiance = outRadiance + hit.material->shade(N, V, Ll, Lel);
 	//}
 	return outRadiance;
 }
@@ -620,6 +637,7 @@ struct Scene
 	void setLight()
 	{
 		ambiensFeny.LightColor = vec3(1, 1, 1);
+		ambiensFeny.position = vec3(0, 1, 0);
 	}
 };
 Scene scene;
@@ -635,24 +653,15 @@ void onInitialization() {
 	vec3 AranyK(3.1f, 2.7f, 1.9f);
 
 	vec3 AranyColor(1, 0.8431372549f, 0); // Arany szine
-	Sphere* sphere = new Sphere(0, 0, -1, 0.5); ///TODO felszabaditani.
+	Sphere* sphere = new Sphere(0, 0, -1, 1); ///TODO felszabaditani.
 	sphere->material->calcF0(AranyN,AranyK);
 	sphere->material->color = AranyColor;
 	objects.push_back(sphere);
 
-//	static vec4 background[windowWidth * windowHeight];
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();
 
-//	static vec4 background[windowWidth * windowHeight];
-	//for (int x = 0; x < windowWidth; x++) {
-	//	for (int y = 0; y < windowHeight; y++) {
-	//		background[y * windowWidth + x] = vec4(0.5, (float)1, 0, 1);
-	//		if(abs(x-y) < 10)
-	//			background[y * windowWidth + x] = vec4(0, (float)0, 1, 1);
-	//	}
-	//}
 	fullScreenTexturedQuad.Create(background);
 
 	// Create vertex shader from string
