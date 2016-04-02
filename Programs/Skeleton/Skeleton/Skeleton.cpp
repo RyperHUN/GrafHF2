@@ -508,6 +508,7 @@ public:
 	Hit intersect(const Ray& ray)
 	{
 		Hit talalat;
+		
 		///TODO Rakerdezni
 		//Kovetkezo feltetelezessel elve: eye = ray._kozeppont, v = ray._nezetiIrany
 		float a = (dot(ray._nezetiIrany,ray._nezetiIrany));
@@ -518,6 +519,9 @@ public:
 		if (diszkriminans < 0) // nincs talalat
 			return talalat; //Defaultbol -1 tehat nincs talalat
 		
+		//Normál vektor beállítása!
+		
+
 		float x1 = (-b + sqrtf(diszkriminans)) / (2 * a);
 		float x2 = (+b + sqrtf(diszkriminans)) / (2 * a);
 		///TODO x1, x2 itt mi lesz???? - Talan a tavolsag a szemtol a metszespontal
@@ -527,12 +531,14 @@ public:
 		{
 			talalat.t = x1;
 			talalat.position = ray._kozeppont + ray._nezetiIrany * talalat.t;
+			talalat.normal = (talalat.position - x1) / radius;
 			return talalat;
 		}
 		else
 		{
 			talalat.t = x2;
 			talalat.position = ray._kozeppont + ray._nezetiIrany * talalat.t;
+			talalat.normal = (talalat.position - x2) / radius;
 			return talalat;
 		}
 
@@ -545,7 +551,7 @@ vec3 trace(Ray ray) {
 	if (hit.t < 0)  ///TODO azzal a feltetelezessel elve hogy La = ambiensFeny szine
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 	vec3 outRadiance = hit.material->color * ambiensFeny.LightColor;
-	///TODO Kovetkezo sorba be van epitve hogy gyengul a fenye a tavolsaggal!
+	///TODO Kovetkezo sorba be van epitve hogy gyengul a fenye a tavolsaggal! - ezt nem igy kell!!!! ezt ugy kell hogy az intenzitása csökken!
 	//vec3 outRadiance = hit.material->color * ambiensFeny.getDecrasedColor(hit.position);
 
 	//for (each light source l) {
@@ -557,6 +563,18 @@ vec3 trace(Ray ray) {
 	///TODO shade fuggveny
 			//outRadiance = outRadiance + hit.material->shade(N, V, Ll, Lel);
 	//}
+	///Todo megcsinalni hogy tukrozodjon az arany!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//if (hit.material->isReflective()) {
+	//	vec3 reflectionDir = reflect(V, N);
+	//	Ray reflectedRay(r + N sign(NV), reflectionDir);
+	//	outRadiance += trace(reflectedRay)*F(V, N);
+	//}
+	//if (hit.material->refractive) {
+	//	vec3 refractionDir = refract(V, N);
+	//	Ray refractedRay(r - N sign(NV), refractionDir);
+	//	outRadiance += trace(refractedRay)*(vec3(1, 1, 1) - F(V, N));
+	//}
+
 	return outRadiance;
 }
 
