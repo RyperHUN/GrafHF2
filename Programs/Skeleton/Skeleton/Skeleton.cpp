@@ -119,6 +119,9 @@ const char *fragmentSource = R"(
 )";
 //===================================================== INNENTOL VAN ERDEKES DOLOG =================================================//
 
+int sgn(float val) {
+	return ((0.0f) < val) - (val < (0.0f));
+}
 
 struct vec3
 {
@@ -210,6 +213,7 @@ struct Material
 	vec3 F0;  // F0 = ( (n-1)^2 + k^2 ) / ( (n+1)^2 + k^2 )
 	//vec3 n;  //Femeknel meg uvegnel nem nulla egyebkent szinte mindig 0 meg ebbol adodoan az F0 konstans
 	  
+	vec3 ka;
 	//CSAK ROUGH MATERIALNAL AZ ALSOK
 	vec3 kd,ks; 
 	float shininess; 
@@ -231,12 +235,14 @@ struct Material
 	//}
 	
 
-	vec3 reflect(vec3 inDir, vec3 normal) 
+	vec3 reflect(vec3 &inDir, vec3 &normal) 
 	{
+		inDir = inDir.normalize(); 
+		normal = normal.normalize();
 		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
 			throw "vec3::reflect() - Csak normalizalt vektorral mukodik a visszaverodes";
 
-		return inDir - normal * dot(normal, inDir) * 2.0f;
+		return inDir - normal * (dot(normal, inDir) * 2.0f);
 	}
 	///TODO itt n már nem jó
 	//vec3 refract(vec3 inDir, vec3 normal)
@@ -550,7 +556,7 @@ vec3 trace(Ray ray) {
 	Hit hit = firstIntersect(ray); //Milyen objektum van legkozelebb
 	if (hit.t < 0)  ///TODO azzal a feltetelezessel elve hogy La = ambiensFeny szine
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
-	vec3 outRadiance = hit.material->color * ambiensFeny.LightColor;
+	vec3 outRadiance = hit.material->ka * ambiensFeny.LightColor;
 	///TODO Kovetkezo sorba be van epitve hogy gyengul a fenye a tavolsaggal! - ezt nem igy kell!!!! ezt ugy kell hogy az intenzitása csökken!
 	//vec3 outRadiance = hit.material->color * ambiensFeny.getDecrasedColor(hit.position);
 
@@ -564,11 +570,16 @@ vec3 trace(Ray ray) {
 			//outRadiance = outRadiance + hit.material->shade(N, V, Ll, Lel);
 	//}
 	///Todo megcsinalni hogy tukrozodjon az arany!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//if (hit.material->isReflective()) {
-	//	vec3 reflectionDir = reflect(V, N);
-	//	Ray reflectedRay(r + N sign(NV), reflectionDir);
-	//	outRadiance += trace(reflectedRay)*F(V, N);
-	//}
+	if (hit.material->isReflective()) {
+		vec3 reflectionDir = hit.material->reflect(ray._nezetiIrany, hit.normal);  // Beérkezési irány, Normál vektora a felületnek
+
+		float kicsinyitesNagysaga = 3.0f;
+		vec3 Neps = hit.normal*(dot(ray._nezetiIrany, hit.normal)) /kicsinyitesNagysaga;
+		vec3 visszaverPos = hit.position;
+		Ray reflectedRay(visszaverPos, reflectionDir);
+		vec3 fresnel = hit.material->Fresnel(ray._nezetiIrany, hit.normal);
+		outRadiance = outRadiance + trace(reflectedRay) * fresnel;
+	}
 	//if (hit.material->refractive) {
 	//	vec3 refractionDir = refract(V, N);
 	//	Ray refractedRay(r - N sign(NV), refractionDir);
@@ -734,7 +745,8 @@ void onInitialization() {
 	
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK);  ///TODO felszabaditani
 	aranyAnyaga->isReflect = true;
-	aranyAnyaga->color = AranyColor;///Beta szín
+	//aranyAnyaga->color = AranyColor;///Beta szín
+	aranyAnyaga->ka = vec3(0, 0, 0);
 	sphere->material = aranyAnyaga;
 	objects.push_back(sphere);
 
