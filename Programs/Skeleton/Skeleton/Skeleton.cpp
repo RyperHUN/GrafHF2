@@ -400,13 +400,13 @@ struct Hit
 	{
 		t = -1;
 	}
-	Hit(Hit& hit)
-	{
-		t = hit.t;
-		position = hit.position;
-		normal = hit.normal;
-		material = hit.material;
-	}
+	//Hit(Hit& hit)
+	//{
+	//	t = hit.t;
+	//	position = hit.position;
+	//	normal = hit.normal;
+	//	material = hit.material;
+	//}
 };
 
 Hit firstIntersect(Ray ray) {
@@ -450,6 +450,7 @@ public:
 		float x2 = (+b + sqrtf(diszkriminans)) / (2 * a);
 		///TODO x1, x2 itt mi lesz???? - Talan a tavolsag a szemtol a metszespontal
 		///TODO HIT.Position.
+		talalat.material = this->material;
 		if (x1 > x2)
 		{
 			talalat.t = x1;
