@@ -198,7 +198,14 @@ namespace TYPES
 
 struct Material 
 {
+	bool isReflect;
+	bool isRefract;
 	///TODO irni konstruktort ami alapbol mindent 0 ba rak
+	Material()
+	{
+		isReflect = false;
+		isRefract = false;
+	}
 	TYPES::Material materialType;
 	vec3 F0;  // F0 = ( (n-1)^2 + k^2 ) / ( (n+1)^2 + k^2 )
 	//vec3 n;  //Femeknel meg uvegnel nem nulla egyebkent szinte mindig 0 meg ebbol adodoan az F0 konstans
@@ -209,8 +216,8 @@ struct Material
 	//IDAIG
 	vec3 color;
 
-	bool isReflective();
-	bool isRefractive();
+	bool isReflective() { return isReflect; }
+	bool isRefractive() { return isRefract; }
 	//void calcF0(float k)
 	//{
 	//	F0 = calcF0(n, k);
@@ -708,7 +715,7 @@ void onInitialization() {
 	Sphere* sphere = new Sphere(0, 0, -1, 1); ///TODO felszabaditani.
 	
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK);  ///TODO felszabaditani
-
+	aranyAnyaga->isReflect = true;
 	aranyAnyaga->color = AranyColor;///Beta szín
 	sphere->material = aranyAnyaga;
 	objects.push_back(sphere);
