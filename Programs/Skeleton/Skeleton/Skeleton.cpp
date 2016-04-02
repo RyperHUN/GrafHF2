@@ -143,7 +143,6 @@ struct vec3
 		return vec3(x / oszto, y / oszto, z / oszto);
 	}
 	float Length() { return sqrtf(x * x + y * y + z * z); }
-	///TODO nem biztos hogy jó
 	vec3 normalize()
 	{
 		float meret = Length();
@@ -428,14 +427,17 @@ public:
 
 //vec3 trace(Ray ray) {
 //
-//	Hit hit = firstIntersect(ray);
-//	if (hit.t < 0) return La; // nothing
+//	Hit hit = firstIntersect(ray); //Milyen objektum van legkozelebb
+//	if (hit.t < 0) 
+//		return La; // nothing  //Ambiens fenyt fogja visszaadni.
 //	vec3 outRadiance = hit.material->ka * La;
 //	for (each light source l) {
-//		Ray shadowRay(r + N, Ll);
-//		Hit shadowHit = firstIntersect(shadowRay);
-//		if (shadowHit.t < 0 || shadowHit.t > | r - yl | )
-//			outRadiance += hit.material->shade(N, V, Ll, Lel);
+//		///TODO ez csak arnyeknak kell
+//		///TODO ShadowRay nel a dian megfelelo iranyba menjen a dolog ( ez kell a shade nek is ) 
+//		//Ray shadowRay(r + N, Ll);  
+//		//Hit shadowHit = firstIntersect(shadowRay);
+//		//if (shadowHit.t < 0 || shadowHit.t > | r - yl | )
+//			outRadiance = outRadiance + hit.material->shade(N, V, Ll, Lel);
 //	}
 //	return outRadiance;
 //}
