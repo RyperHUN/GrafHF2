@@ -256,6 +256,7 @@ struct Material
 	vec3 kd,ks; 
 	float shininess; 
 	//IDAIG
+	vec3 color;
 
 	bool isReflective();
 	bool isRefractive();
@@ -420,7 +421,6 @@ public:
 		: center(x, y, z), radius(r)
 	{
 		material = new Material(); ///TODO felszabaditani
-		material->calcF0(0, 1);
 		
 		//CSAK ROUGH MATERIALNAL AZ ALSOK
 
@@ -458,22 +458,22 @@ public:
 	}
 };
 
-//vec3 trace(Ray ray) {
-//
-//	Hit hit = firstIntersect(ray); //Milyen objektum van legkozelebb
-//	if (hit.t < 0)  ///TODO azzal a feltetelezessel elve hogy La = ambiensFeny szine
-//		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
-//	vec3 outRadiance = hit.material->ka * La;
-//	for (each light source l) {
-//		///TODO ez csak arnyeknak kell
-//		///TODO ShadowRay nel a dian megfelelo iranyba menjen a dolog ( ez kell a shade nek is ) 
-//		//Ray shadowRay(r + N, Ll);  
-//		//Hit shadowHit = firstIntersect(shadowRay);
-//		//if (shadowHit.t < 0 || shadowHit.t > | r - yl | )
-//			outRadiance = outRadiance + hit.material->shade(N, V, Ll, Lel);
-//	}
-//	return outRadiance;
-//}
+vec3 trace(Ray ray) {
+
+	Hit hit = firstIntersect(ray); //Milyen objektum van legkozelebb
+	if (hit.t < 0)  ///TODO azzal a feltetelezessel elve hogy La = ambiensFeny szine
+		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
+	vec3 outRadiance = hit.material->color * ambiensFeny.LightColor;
+	//for (each light source l) {
+	//	///TODO ez csak arnyeknak kell
+	//	///TODO ShadowRay nel a dian megfelelo iranyba menjen a dolog ( ez kell a shade nek is ) 
+	//	//Ray shadowRay(r + N, Ll);  
+	//	//Hit shadowHit = firstIntersect(shadowRay);
+	//	//if (shadowHit.t < 0 || shadowHit.t > | r - yl | )
+	//		outRadiance = outRadiance + hit.material->shade(N, V, Ll, Lel);
+	//}
+	return outRadiance;
+}
 
 
 
@@ -607,6 +607,7 @@ void onInitialization() {
 	vec3 AranyColor(1, 0.8431372549f, 0); // Arany szine
 	Sphere* sphere = new Sphere(0, 0, -1, 0.5); ///TODO felszabaditani.
 	sphere->material->calcF0(AranyN,AranyK);
+	sphere->material->color = AranyColor;
 	objects.push_back(sphere);
 
 	scene.createImage();
