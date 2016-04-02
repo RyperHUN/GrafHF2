@@ -247,9 +247,11 @@ namespace TYPES
 
 struct Material 
 {
+	///TODO irni konstruktort ami alapbol mindent 0 ba rak
 	TYPES::Material materialType;
 	vec3 F0;  // F0 = ( (n-1)^2 + k^2 ) / ( (n+1)^2 + k^2 )
-	float n;  //Femeknel meg uvegnel nem nulla egyebkent szinte mindig 0 meg ebbol adodoan az F0 konstans
+	vec3 n;  //Femeknel meg uvegnel nem nulla egyebkent szinte mindig 0 meg ebbol adodoan az F0 konstans
+	vec3 k;  
 	//CSAK ROUGH MATERIALNAL AZ ALSOK
 	vec3 kd,ks; 
 	float shininess; 
@@ -257,17 +259,28 @@ struct Material
 
 	bool isReflective();
 	bool isRefractive();
-	void calcF0(float k)
-	{
-		F0 = calcF0(n, k);
-	}
-	vec3 calcF0(float nToresmutato, float k)
+	//void calcF0(float k)
+	//{
+	//	F0 = calcF0(n, k);
+	//}
+	//vec3 calcF0(float nToresmutato, float k)
+	//{
+	//	n = nToresmutato;
+	//	float f0 = (powf(n - 1, 2) + powf(k, 2)) / (powf(n + 1, 2) + powf(k, 2));
+	//	F0 = vec3(f0, f0, f0);
+	//	return F0;
+	//}
+	vec3 calcF0(const vec3& nToresmutato,const vec3& k)
 	{
 		n = nToresmutato;
-		float f0 = (powf(n - 1, 2) + powf(k, 2)) / (powf(n + 1, 2) + powf(k, 2));
-		F0 = vec3(f0, f0, f0);
+		this->k = k;
+		float r = (powf(n.x - 1, 2) + powf(k.x, 2)) / (powf(n.x + 1, 2) + powf(k.x, 2));
+		float g = (powf(n.y - 1, 2) + powf(k.y, 2)) / (powf(n.y + 1, 2) + powf(k.y, 2));
+		float b = (powf(n.z - 1, 2) + powf(k.z, 2)) / (powf(n.z + 1, 2) + powf(k.z, 2));
+		F0 = vec3(r, g, b);
 		return F0;
 	}
+
 	vec3 reflect(vec3 inDir, vec3 normal) 
 	{
 		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
@@ -275,24 +288,25 @@ struct Material
 
 		return inDir - normal * dot(normal, inDir) * 2.0f;
 	}
-	vec3 refract(vec3 inDir, vec3 normal) 
-	{
-		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
-			throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+	///TODO itt n már nem jó
+	//vec3 refract(vec3 inDir, vec3 normal)
+	//{
+	//	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+	//		throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
 
-		float ior = n;
-		float cosa = -dot(normal, inDir);
-		if (cosa < 0)
-		{
-			cosa = -cosa;
-			//normal = -normal; // "-normal" kell ide
-			normal = vec3(-normal.x, -normal.y, -normal.z);
-			ior = 1 / n;
-		}
-		float disc = 1 - (1 - cosa * cosa) / ior / ior;
-		if (disc < 0) return reflect(inDir, normal);
-		return inDir / ior + normal * (cosa / ior - sqrt(disc));
-	}
+	//	float ior = n;
+	//	float cosa = -dot(normal, inDir);
+	//	if (cosa < 0)
+	//	{
+	//		cosa = -cosa;
+	//		//normal = -normal; // "-normal" kell ide
+	//		normal = vec3(-normal.x, -normal.y, -normal.z);
+	//		ior = 1 / n;
+	//	}
+	//	float disc = 1 - (1 - cosa * cosa) / ior / ior;
+	//	if (disc < 0) return reflect(inDir, normal);
+	//	return inDir / ior + normal * (cosa / ior - sqrt(disc));
+	//}
 	vec3 Fresnel(vec3 inDir, vec3 normal) 
 	{
 		float cosa = fabs(dot(normal, inDir));
@@ -569,7 +583,15 @@ struct Scene
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 
+	//Feladatban specifikalt adatok
+	vec3 EzustN(0.14, 0.16, 0.13);
+	vec3 EzustK(4.1, 2.3, 3.1);
+	vec3 AranyN(0.17, 0.35, 1.5);
+	vec3 AranyK(3.1, 2.7, 1.9);
+
+	vec3 AranyColor(1, 0.8431372549f, 0); // Arany szine
 	Sphere* sphere = new Sphere(0, 0, -1, 0.5); ///TODO felszabaditani.
+	sphere->material->calcF0(AranyN,AranyK);
 	objects.push_back(sphere);
 
 	static vec4 background[windowWidth * windowHeight];
@@ -662,6 +684,13 @@ void onMouseMotion(int pX, int pY) {
 void onIdle() {
 	long time = glutGet(GLUT_ELAPSED_TIME); // elapsed time since the start of the program
 }
+
+///TODO KERDESEK
+// SmoothMaterial classban n ( törésmutató ) az egy float, de a háziban mind a 3 spektrumra megvan adva az n értéke.
+// A haziban megadott n/k értékek közül egyáltalán az egyik a törésmutató ( n ) a másik meg a k ( kioltási tényező ) PL: aranyozott (n/k az r,g,b hullámhosszain: 0.17/3.1) itt n[0] = 0.17, k[0] = 3.1???
+// Honnan van meg egy anyag szine? Az aranyozott dolognak adjak egy olyan attributumot hogy color és az legyen aranyhoz hasonlit??? Egyik dian se láttam colort meg ő se emlitette
+// Mi az a kd meg a ks??? Diffuz meg spekularis allando ha jól ertettemde ezt ki adja meg egy rücskös felületnél???
+// Ha jól értettem a szemet valahova el kell rakni de itt már bebonyolódtam...
 
 // Idaig modosithatod...
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
