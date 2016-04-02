@@ -236,6 +236,7 @@ struct Material
 	//{
 	//	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
 	//		throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+	virtual void calcF0() {}
 	virtual vec3 calcF0(const vec3& nToresmutato, const vec3& k) { return vec3(); }
 	//	float ior = n;
 	//	float cosa = -dot(normal, inDir);
@@ -281,12 +282,14 @@ class SmoothMaterial : public Material{
 	//vec3   F0;	// - Base class ba van!
 	vec3 n;	// n
 	vec3 k; // Ezt igazabol nem kotelezo eltarolni
+	///TODO ka attributum megadna a szinet ha ambiens feny megvilagitja
 public:
 	SmoothMaterial(vec3 nToresmutato, vec3 kKioltasiTenyezo)
 	{
 		materialType = TYPES::Smooth;
 		n = nToresmutato;
 		k = kKioltasiTenyezo;
+		calcF0();
 	}
 	vec3 reflect(vec3 inDir, vec3 normal) {
 		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
@@ -316,7 +319,14 @@ public:
 		float cosa = fabs(dot(normal, inDir));
 		return F0 + (vec3(1, 1, 1) - F0) * pow(1 - cosa, 5);
 	}
-
+	//A megadott adatokkal szamolja ki
+	void calcF0()
+	{
+		float r = (powf(n.x - 1, 2) + powf(k.x, 2)) / (powf(n.x + 1, 2) + powf(k.x, 2));
+		float g = (powf(n.y - 1, 2) + powf(k.y, 2)) / (powf(n.y + 1, 2) + powf(k.y, 2));
+		float b = (powf(n.z - 1, 2) + powf(k.z, 2)) / (powf(n.z + 1, 2) + powf(k.z, 2));
+		F0 = vec3(r, g, b);
+	}
 	vec3 calcF0(const vec3& nToresmutato, const vec3& k) override
 	{
 		n = nToresmutato;
@@ -486,9 +496,6 @@ public:
 	Sphere(float x, float y, float z, float r)
 		: center(x, y, z), radius(r)
 	{
-		material = new Material(); ///TODO felszabaditani
-		
-		//CSAK ROUGH MATERIALNAL AZ ALSOK
 
 	}
 	Hit intersect(const Ray& ray)
@@ -699,8 +706,11 @@ void onInitialization() {
 
 	vec3 AranyColor(1, 0.8431372549f, 0); // Arany szine
 	Sphere* sphere = new Sphere(0, 0, -1, 1); ///TODO felszabaditani.
-	//sphere->material->calcF0(AranyN,AranyK);
-	sphere->material->color = AranyColor;
+	
+	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK);  ///TODO felszabaditani
+
+	aranyAnyaga->color = AranyColor;///Beta szín
+	sphere->material = aranyAnyaga;
 	objects.push_back(sphere);
 
 	vector<vec4> background;
