@@ -267,6 +267,7 @@ struct Material
 		n = nToresmutato;
 		float f0 = (powf(n - 1, 2) + powf(k, 2)) / (powf(n + 1, 2) + powf(k, 2));
 		F0 = vec3(f0, f0, f0);
+		return F0;
 	}
 	vec3 reflect(vec3 inDir, vec3 normal) 
 	{
@@ -390,8 +391,6 @@ public:
 		material->calcF0(0, 1);
 		
 		//CSAK ROUGH MATERIALNAL AZ ALSOK
-		
-		float shininess;
 
 	}
 	Hit intersect(const Ray& ray)
