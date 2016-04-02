@@ -331,11 +331,24 @@ struct Ray {
 struct Light
 {
 	float Lout; // Nem biztos hogy float
+	vec3 LightColor;
 	TYPES::Light lightType; //Ambiens vagy irány fényforrás
 	vec3 getLightDir(); ///TODO
 	vec3 getInRad(); ///TODO
 	vec3 getDist(); ///TODO
+	Light() {}
 };
+
+struct AmbientLight : public Light
+{
+	AmbientLight(vec3 NewLightColor)
+	{
+		lightType = TYPES::Ambient;
+		LightColor = NewLightColor;
+	}
+};
+
+AmbientLight ambiensFeny(vec3(1, 1, 1)); // Igy elmeletileg feher lesz
 
 struct Camera
 {
@@ -428,8 +441,8 @@ public:
 //vec3 trace(Ray ray) {
 //
 //	Hit hit = firstIntersect(ray); //Milyen objektum van legkozelebb
-//	if (hit.t < 0) 
-//		return La; // nothing  //Ambiens fenyt fogja visszaadni.
+//	if (hit.t < 0)  ///TODO azzal a feltetelezessel elve hogy La = ambiensFeny szine
+//		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 //	vec3 outRadiance = hit.material->ka * La;
 //	for (each light source l) {
 //		///TODO ez csak arnyeknak kell
