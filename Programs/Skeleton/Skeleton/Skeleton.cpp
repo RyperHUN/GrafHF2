@@ -494,7 +494,8 @@ unsigned int shaderProgram;
 class FullScreenTexturedQuad {
 	unsigned int vao, textureId;	// vertex array object id and texture id
 public:
-	void Create(vec4 image[windowWidth * windowHeight]) {
+	//void Create(vec4 image[windowWidth * windowHeight]) {
+	void Create(const vector<vec4>& image){
 		glGenVertexArrays(1, &vao);	// create 1 vertex array object
 		glBindVertexArray(vao);		// make it active
 
@@ -514,9 +515,18 @@ public:
 		glGenTextures(1, &textureId);  				// id generation
 		glBindTexture(GL_TEXTURE_2D, textureId);    // binding
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, image); // To GPU
+		int meret = image.size();
+		vec4* copyableImage= new vec4[meret]; ///TODO felszabadit
+		for (unsigned i = 0; i < meret; i++)
+		{
+			copyableImage[i] = image[i];
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, copyableImage); // To GPU
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // sampling
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		delete[] copyableImage;
 	}
 
 	void Draw() {
@@ -610,9 +620,12 @@ void onInitialization() {
 	sphere->material->color = AranyColor;
 	objects.push_back(sphere);
 
-	scene.createImage();
+//	static vec4 background[windowWidth * windowHeight];
+	vector<vec4> background;
+	background.resize(windowWidth * windowHeight);
+	//background = scene.createImage();
 
-	static vec4 background[windowWidth * windowHeight];
+//	static vec4 background[windowWidth * windowHeight];
 	for (int x = 0; x < windowWidth; x++) {
 		for (int y = 0; y < windowHeight; y++) {
 			background[y * windowWidth + x] = vec4(0.5, (float)1, 0, 1);
