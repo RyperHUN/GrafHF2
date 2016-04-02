@@ -373,13 +373,14 @@ struct Camera
 
 	//TODO X-Y koordinátát beadsz neki ( Pixel pont a képernyőn, 600x600 ason)
 	//Es megmondja hogy merre nez a sugar!
-	Ray GetRay(float X, float Y) ///TODO
+	Ray GetRay(int X, int Y) ///TODO
 	{
-		vec3 p = planePosition + right*(2 * X / windowWidth - 1) + up*(2 * Y / windowHeight - 1);
+		vec3 p = planePosition + right*(2 * float(X) / windowWidth - 1) + up*(2 * float(Y) / windowHeight - 1);
 		Ray sugar;
 		sugar._nezetiIrany = p.normalize();
 		sugar._kozeppont = eyePosition;
 		
+		return sugar;
 	}
 };
 struct Hit;
@@ -399,10 +400,17 @@ struct Hit
 	{
 		t = -1;
 	}
+	Hit(Hit& hit)
+	{
+		t = hit.t;
+		position = hit.position;
+		normal = hit.normal;
+		material = hit.material;
+	}
 };
 
 Hit firstIntersect(Ray ray) {
-	Hit bestHit;
+	Hit bestHit; ///TODO normál vektor kiszámítása
 	for (unsigned i = 0; i < objects.size(); i++)
 	{
 		Intersectable * obj = objects[i];
@@ -517,7 +525,7 @@ public:
 
 		int meret = image.size();
 		vec4* copyableImage= new vec4[meret]; ///TODO felszabadit
-		for (unsigned i = 0; i < meret; i++)
+		for (int i = 0; i < meret; i++)
 		{
 			copyableImage[i] = image[i];
 		}
@@ -551,9 +559,28 @@ struct Scene
 	{
 		////TODO adja hozzá object tombhoz
 	}
-	void createImage()
+	vector<vec4> createImage()
 	{
 		setCamera();
+		setLight();
+		
+		vector<vec4> elkeszultKep;
+		elkeszultKep.resize(windowWidth * windowHeight);
+		for (int x = 0; x < windowWidth; x++) {
+			for (int y = 0; y < windowHeight; y++) {
+				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
+				Ray ray = camera.GetRay(x, y);
+
+				vec3 vegsoSzin = vec3(0,0,0);
+				///TODO repeat
+				{
+					vegsoSzin = trace(ray);
+				}
+
+				elkeszultKep[y * windowWidth + x] = vec4(vegsoSzin.x, vegsoSzin.y, vegsoSzin.y, 1);
+			}
+		}
+		return elkeszultKep;
 		//for each pixel of the screen
 		//{
 		//	Final color = 0;
@@ -580,18 +607,6 @@ struct Scene
 		//		increment depth;
 		//	} until reflection factor is 0 or maximum depth is reached;
 		//}
-		static vec4 elkeszultKep[windowWidth * windowHeight];
-		for (int x = 0; x < windowWidth; x++) {
-			for (int y = 0; y < windowHeight; y++) {
-				elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0
-				//Ray ray = camera.getRay(x,y);
-				vec3 vegsoSzin = vec3(0,0,0);
-				///TODO repeat
-				{
-					//Hit legkozelebbiTargy = firstIntersect(ray);
-				}
-			}
-		}
 	}
 	///TODO atnezni parametrizalni
 	void setCamera()
@@ -600,6 +615,10 @@ struct Scene
 		camera.planePosition = vec3(0, 0, -1);
 		camera.right = vec3(1, 0, 0);
 		camera.up = cross(camera.right,camera.planePosition);
+	}
+	void setLight()
+	{
+		ambiensFeny.LightColor = vec3(1, 1, 1);
 	}
 };
 Scene scene;
@@ -623,16 +642,16 @@ void onInitialization() {
 //	static vec4 background[windowWidth * windowHeight];
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
-	//background = scene.createImage();
+	background = scene.createImage();
 
 //	static vec4 background[windowWidth * windowHeight];
-	for (int x = 0; x < windowWidth; x++) {
-		for (int y = 0; y < windowHeight; y++) {
-			background[y * windowWidth + x] = vec4(0.5, (float)1, 0, 1);
-			if(abs(x-y) < 10)
-				background[y * windowWidth + x] = vec4(0, (float)0, 1, 1);
-		}
-	}
+	//for (int x = 0; x < windowWidth; x++) {
+	//	for (int y = 0; y < windowHeight; y++) {
+	//		background[y * windowWidth + x] = vec4(0.5, (float)1, 0, 1);
+	//		if(abs(x-y) < 10)
+	//			background[y * windowWidth + x] = vec4(0, (float)0, 1, 1);
+	//	}
+	//}
 	fullScreenTexturedQuad.Create(background);
 
 	// Create vertex shader from string
