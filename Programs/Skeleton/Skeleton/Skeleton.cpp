@@ -337,9 +337,8 @@ struct Ray {
 		_kozeppont = kozeppont;
 		_nezetiIrany = nezetiIrany;
 	}
+	Ray() {}
 };
-
-
 
 
 struct Light
@@ -366,14 +365,21 @@ AmbientLight ambiensFeny(vec3(1, 1, 1)); // Igy elmeletileg feher lesz
 
 struct Camera
 {
-	vec3 eye; // Szem pozició, ahonnan a kamera néz???
+	vec3 eyePosition; // Szem pozició, ahonnan a kamera néz???
 	vec3 planePosition; //Megmondja merre nez a kamera, vagyis hogy mennyire van messze a "vaszon" amin a pixelek vannak
 	vec3 up;
 	vec3 right;
 
 	//TODO X-Y koordinátát beadsz neki ( Pixel pont a képernyőn, 600x600 ason)
 	//Es megmondja hogy merre nez a sugar!
-	//Ray GetRay(); ///TODO
+	Ray GetRay(float X, float Y) ///TODO
+	{
+		vec3 p = planePosition + right*(2 * X / windowWidth - 1) + up*(2 * Y / windowHeight - 1);
+		Ray sugar;
+		sugar._nezetiIrany = p.normalize();
+		sugar._kozeppont = eyePosition;
+		
+	}
 };
 struct Hit;
 struct Intersectable
@@ -580,7 +586,7 @@ struct Scene
 	///TODO atnezni parametrizalni
 	void setCamera()
 	{
-		camera.eye = vec3(0, 0, 1);
+		camera.eyePosition = vec3(0, 0, 1);
 		camera.planePosition = vec3(0, 0, -1);
 		camera.right = vec3(1, 0, 0);
 		camera.up = cross(camera.right,camera.planePosition);
