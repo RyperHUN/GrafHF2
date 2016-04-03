@@ -426,6 +426,7 @@ struct AmbientLight : public Light
 struct DirectionLight : public Light
 {
 	vec3 lightDirection;
+	float mekkoraRadianbanLatszik;
 	DirectionLight(vec3 NewLightColor,vec3 dir,vec3 pos)
 	{
 		lightType = TYPES::Direction;
@@ -442,8 +443,9 @@ struct DirectionLight : public Light
 	}
 };
 
-DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), vec3(20, 0, 0));
-AmbientLight ambiensFeny(vec3(1, 1, 1)); // Igy elmeletileg feher lesz
+DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), vec3(0, 80, -1));
+
+AmbientLight ambiensFeny(vec3(0.6f, 0.6f, 1)); // Igy elmeletileg feher lesz
 
 struct Camera
 {
@@ -556,7 +558,21 @@ vec3 trace(Ray ray) {
 	Hit hit = firstIntersect(ray); //Milyen objektum van legkozelebb
 	if (hit.t < 0)  ///TODO azzal a feltetelezessel elve hogy La = ambiensFeny szine
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
-	vec3 outRadiance = hit.material->ka * ambiensFeny.LightColor;
+	vec3 outRadiance = vec3(0, 0, 0);
+
+	vec3 Visszavert = hit.material->reflect(ray._nezetiIrany, hit.normal);
+	vec3 NapIrany = nap.position - hit.position;
+	float beta = acos(dot(NapIrany, Visszavert));
+	///TODO valamiert nem mukodik a nap mágia
+	//if (beta <= nap.mekkoraRadianbanLatszik) //Nap megvilagitja
+	//{
+	//	vec3 fresnel = hit.material->Fresnel(ray._nezetiIrany, hit.normal);
+	//	outRadiance = nap.LightColor * fresnel;
+	//}
+	//else
+	{
+		outRadiance = hit.material->ka * ambiensFeny.LightColor;
+	}
 	///TODO Kovetkezo sorba be van epitve hogy gyengul a fenye a tavolsaggal! - ezt nem igy kell!!!! ezt ugy kell hogy az intenzitása csökken!
 	//vec3 outRadiance = hit.material->color * ambiensFeny.getDecrasedColor(hit.position);
 
@@ -724,8 +740,8 @@ struct Scene
 	}
 	void setLight()
 	{
-		ambiensFeny.LightColor = vec3(1, 1, 1);
 		ambiensFeny.position = vec3(0, 1, 0);
+		nap.mekkoraRadianbanLatszik = 0.0174532925;
 	}
 };
 Scene scene;
@@ -746,7 +762,7 @@ void onInitialization() {
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK);  ///TODO felszabaditani
 	aranyAnyaga->isReflect = true;
 	//aranyAnyaga->color = AranyColor;///Beta szín
-	aranyAnyaga->ka = vec3(0, 0, 0);
+	aranyAnyaga->ka = vec3(0.2, 0.2, 0.2);
 	sphere->material = aranyAnyaga;
 	objects.push_back(sphere);
 
