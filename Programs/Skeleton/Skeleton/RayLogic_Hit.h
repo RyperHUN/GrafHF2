@@ -13,13 +13,6 @@ struct Hit
 	{
 		t = -1;
 	}
-	//Hit(Hit& hit)
-	//{
-	//	t = hit.t;
-	//	position = hit.position;
-	//	normal = hit.normal;
-	//	material = hit.material;
-	//}
 };
 
 struct Ray {

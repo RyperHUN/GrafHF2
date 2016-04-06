@@ -35,25 +35,10 @@ struct Material
 
 		return inDir - normal * (dot(normal, inDir) * 2.0f);
 	}
-	///TODO itt n már nem jó
-	//vec3 refract(vec3 inDir, vec3 normal)
-	//{
-	//	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
-	//		throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+	virtual vec3 refract(vec3 &inDir, vec3 &normal);
+
 	virtual void calcF0() {}
-	//	float ior = n;
-	//	float cosa = -dot(normal, inDir);
-	//	if (cosa < 0)
-	//	{
-	//		cosa = -cosa;
-	//		//normal = -normal; // "-normal" kell ide
-	//		normal = vec3(-normal.x, -normal.y, -normal.z);
-	//		ior = 1 / n;
-	//	}
-	//	float disc = 1 - (1 - cosa * cosa) / ior / ior;
-	//	if (disc < 0) return reflect(inDir, normal);
-	//	return inDir / ior + normal * (cosa / ior - sqrt(disc));
-	//}
+
 	vec3 Fresnel(vec3 inDir, vec3 normal)
 	{
 		float cosa = fabs(dot(normal, inDir));
@@ -98,25 +83,36 @@ public:
 	}
 	vec3 reflect(vec3 inDir, vec3 normal) {
 		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
-			throw "vec3::reflect() - Csak normalizalt vektorral mukodik a visszaverodes";
+		{
+			inDir = inDir.normalize();
+			normal = normal.normalize();
+			throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+		}
 
 		return inDir - normal * dot(normal, inDir) * 2.0f;
 	}
 	///TODO at kene irni hogy mukodjon vec3 n el! bár lehet nincs rá szükség vízhez kell majd
 	//vec3 refract(vec3 inDir, vec3 normal) {
 	//	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+	//	{
+	//		inDir = inDir.normalize();
+	//		normal = normal.normalize();
 	//		throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
+	//	}
 
-	//	float ior = n;
+	//	vec3 ior = n;
 	//	float cosa = -dot(normal, inDir);
 	//	if (cosa < 0)
 	//	{
 	//		cosa = -cosa;
 	//		//normal = -normal; // "-normal" kell ide
 	//		normal = vec3(-normal.x, -normal.y, -normal.z);
-	//		ior = 1 / n;
+	//		//ior = 1 / n; // Kovetkezo sorban mashogy megoldva
+	//		ior = vec3(1 / n.x, 1 / n.y, 1 / n.z);
 	//	}
-	//	float disc = 1 - (1 - cosa * cosa) / ior / ior;
+	//	float cos_magic = (1 - cosa * cosa);
+	//	vec3 cos_vec = vec3(cos_magic, cos_magic, cos_magic);
+	//	vec3 disc = vec3(1,1,1) - cos_vec / (ior*ior);
 	//	if (disc < 0) return reflect(inDir, normal);
 	//	return inDir / ior + normal * (cosa / ior - sqrt(disc));
 	//}
