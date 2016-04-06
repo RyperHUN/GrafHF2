@@ -59,3 +59,4 @@ public:
 	}
 };
 
+///TODO teglalap vagy sik

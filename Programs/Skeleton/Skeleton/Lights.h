@@ -2,6 +2,8 @@
 
 #include "Types.h"
 
+
+
 struct Light
 {
 	TYPES::Light lightType; //Ambiens vagy irány fényforrás
@@ -22,18 +24,11 @@ struct Light
 
 struct AmbientLight : public Light
 {
-	AmbientLight(vec3 NewLightColor)
+	AmbientLight(vec3 NewLightColor,float intensity)
 	{
 		lightType = TYPES::Ambient;
 		LightColor = NewLightColor;
-	}
-	vec3 getDecrasedColor(vec3 intersectPos)
-	{
-		float tavolsagNegyzet = getSquareDist(intersectPos);
-
-		vec3 csokkentettColor(LightColor.x / tavolsagNegyzet, LightColor.y / tavolsagNegyzet, LightColor.z / tavolsagNegyzet);
-		return csokkentettColor;
-
+		this->intensity = intensity;
 	}
 };
 
@@ -41,18 +36,22 @@ struct DirectionLight : public Light
 {
 	vec3 lightDirection;
 	float mekkoraRadianbanLatszik;
-	DirectionLight(vec3 NewLightColor, vec3 dir, vec3 pos)
+	DirectionLight(vec3 NewLightColor, vec3 dir, vec3 pos,float intensity)
 	{
 		lightType = TYPES::Direction;
+		this->position = pos;
 		lightDirection = dir;
 		LightColor = NewLightColor;
+		this->intensity = intensity;
 	}
-	vec3 getDecrasedColor(vec3 intersectPos)
+	float getInRad()
 	{
-		float tavolsagNegyzet = getSquareDist(intersectPos);
-
-		vec3 csokkentettColor(LightColor.x / tavolsagNegyzet, LightColor.y / tavolsagNegyzet, LightColor.z / tavolsagNegyzet);
-		return csokkentettColor;
-
+		return intensity;
 	}
 };
+
+float magic_intensity = 0.4f;
+
+DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), vec3(0, 80, -1),magic_intensity*10);
+
+AmbientLight ambiensFeny(vec3(1, 1, 1),magic_intensity); // Igy elmeletileg feher lesz

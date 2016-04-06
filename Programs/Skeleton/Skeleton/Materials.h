@@ -18,25 +18,13 @@ struct Material
 
 	vec3 ka;
 	//CSAK ROUGH MATERIALNAL AZ ALSOK
-	vec3 kd, ks;
+	vec3 kd, ks;  // Ks - anyag szine ! , Ks - spekularis resze, ami visszaverodik
 	float shininess;
 	//IDAIG
 	vec3 color;
 
 	bool isReflective() { return isReflect; }
 	bool isRefractive() { return isRefract; }
-	//void calcF0(float k)
-	//{
-	//	F0 = calcF0(n, k);
-	//}
-	//vec3 calcF0(float nToresmutato, float k)
-	//{
-	//	n = nToresmutato;
-	//	float f0 = (powf(n - 1, 2) + powf(k, 2)) / (powf(n + 1, 2) + powf(k, 2));
-	//	F0 = vec3(f0, f0, f0);
-	//	return F0;
-	//}
-
 
 	vec3 reflect(vec3 &inDir, vec3 &normal)
 	{
@@ -53,7 +41,6 @@ struct Material
 	//	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
 	//		throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
 	virtual void calcF0() {}
-	virtual vec3 calcF0(const vec3& nToresmutato, const vec3& k) { return vec3(); }
 	//	float ior = n;
 	//	float cosa = -dot(normal, inDir);
 	//	if (cosa < 0)
@@ -100,11 +87,13 @@ class SmoothMaterial : public Material {
 	vec3 k; // Ezt igazabol nem kotelezo eltarolni
 			///TODO ka attributum megadna a szinet ha ambiens feny megvilagitja
 public:
-	SmoothMaterial(vec3 nToresmutato, vec3 kKioltasiTenyezo)
+	SmoothMaterial(vec3 nToresmutato, vec3 kKioltasiTenyezo, bool isReflect, bool isRefract)
 	{
-		materialType = TYPES::Smooth;
-		n = nToresmutato;
-		k = kKioltasiTenyezo;
+		this->materialType = TYPES::Smooth;
+		this->isReflect = isReflect;
+		this->isRefract = isRefract;
+		this->n = nToresmutato;
+		this->k = kKioltasiTenyezo;
 		calcF0();
 	}
 	vec3 reflect(vec3 inDir, vec3 normal) {
@@ -143,26 +132,27 @@ public:
 		float b = (powf(n.z - 1, 2) + powf(k.z, 2)) / (powf(n.z + 1, 2) + powf(k.z, 2));
 		F0 = vec3(r, g, b);
 	}
-	vec3 calcF0(const vec3& nToresmutato, const vec3& k) override
-	{
-		n = nToresmutato;
-		this->k = k;
-		float r = (powf(n.x - 1, 2) + powf(k.x, 2)) / (powf(n.x + 1, 2) + powf(k.x, 2));
-		float g = (powf(n.y - 1, 2) + powf(k.y, 2)) / (powf(n.y + 1, 2) + powf(k.y, 2));
-		float b = (powf(n.z - 1, 2) + powf(k.z, 2)) / (powf(n.z + 1, 2) + powf(k.z, 2));
-		F0 = vec3(r, g, b);
-		return F0;
-	}
 };
 
 ///TODO
 //Szin Phong-Bling modellbol lesz 
 //ka hozzadodik a komponens, akkoris ha árnyékban van
 //diffuz és spekulárishoz pedig kellenek shadowRayek
-class RoughMaterial {
+class RoughMaterial : public Material {
 	vec3 kd, ks;
 	float  shininess;
+	float n, k;
+	
 public:
+	RoughMaterial(float nToresmutato,float kKioltasiTenyezo, bool isReflect, bool isRefract)
+	{
+		this->materialType = TYPES::Smooth;
+		this->isReflect = isReflect;
+		this->isRefract = isRefract;
+		this->n = nToresmutato;
+		this->k = kKioltasiTenyezo;
+		calcF0();
+	}
 	vec3 shade(vec3 normal, vec3 viewDir, vec3 lightDir,
 		vec3 inRad)
 	{
