@@ -121,6 +121,9 @@ public:
 	//	return inDir / ior + normal * (cosa / ior - sqrt(disc));
 	//}
 	vec3 Fresnel(vec3 inDir, vec3 normal) {
+		inDir = inDir.normalize();
+		normal = normal.normalize();
+
 		float cosa = fabs(dot(normal, inDir));
 		return F0 + (vec3(1, 1, 1) - F0) * pow(1 - cosa, 5);
 	}
