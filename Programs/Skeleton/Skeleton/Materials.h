@@ -143,14 +143,18 @@ class RoughMaterial : public Material {
 	float n, k;
 	
 public:
-	RoughMaterial(float nToresmutato,float kKioltasiTenyezo, bool isReflect, bool isRefract)
+	RoughMaterial(vec3 ka,vec3 kd, vec3 ks, float shininess, bool isReflect, bool isRefract)
 	{
 		this->materialType = TYPES::Smooth;
 		this->isReflect = isReflect;
 		this->isRefract = isRefract;
-		this->n = nToresmutato;
-		this->k = kKioltasiTenyezo;
-		calcF0();
+		n = 0;
+		k = 0;
+		this->kd = kd;
+		this->ks= ks;
+		this->ka = ka;
+
+		this->shininess = shininess;
 	}
 	vec3 shade(vec3 normal, vec3 viewDir, vec3 lightDir,
 		vec3 inRad)
