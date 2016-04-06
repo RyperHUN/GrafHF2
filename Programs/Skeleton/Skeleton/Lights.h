@@ -50,8 +50,8 @@ struct DirectionLight : public Light
 	}
 };
 
-float magic_intensity = 0.4f;
+float magic_intensity = 0.2f;
 
-DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), vec3(0, 80, -1),magic_intensity*10);
+DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), vec3(0, 60, -1),magic_intensity*10);
 
 AmbientLight ambiensFeny(vec3(1, 1, 1),magic_intensity); // Igy elmeletileg feher lesz

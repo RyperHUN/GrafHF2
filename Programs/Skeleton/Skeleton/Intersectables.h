@@ -36,23 +36,25 @@ public:
 							//Normál vektor beállítása!
 
 
-		float x1 = (-b + sqrtf(diszkriminans)) / (2 * a);
-		float x2 = (+b + sqrtf(diszkriminans)) / (2 * a);
+		float t1 = (-b + sqrtf(diszkriminans)) / (2 * a);
+		float t2 = (+b + sqrtf(diszkriminans)) / (2 * a);
 		///TODO x1, x2 itt mi lesz???? - Talan a tavolsag a szemtol a metszespontal
 		///TODO HIT.Position.
 		talalat.material = this->material;
-		if (x1 > x2)
+		if (t1 > t2 && t1 > 0)
 		{
-			talalat.t = x1;
+			talalat.t = t1;
 			talalat.position = ray._kozeppont + ray._nezetiIrany * talalat.t;
-			talalat.normal = (talalat.position - x1) / radius;
+			talalat.normal = (talalat.position - center) / radius;
+			talalat.normal = talalat.normal.normalize();
 			return talalat;
 		}
-		else
+		else if( t2 > 0)
 		{
-			talalat.t = x2;
+			talalat.t = t2;
 			talalat.position = ray._kozeppont + ray._nezetiIrany * talalat.t;
-			talalat.normal = (talalat.position - x2) / radius;
+			talalat.normal = (talalat.position - center) / radius;
+			talalat.normal = talalat.normal.normalize();
 			return talalat;
 		}
 

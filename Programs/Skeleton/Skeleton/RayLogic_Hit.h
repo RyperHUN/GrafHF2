@@ -22,6 +22,7 @@ struct Ray {
 	{
 		_kozeppont = kozeppont;
 		_nezetiIrany = nezetiIrany;
+		_nezetiIrany = _nezetiIrany.normalize();
 	}
 	Ray() {}
 };

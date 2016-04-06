@@ -138,14 +138,12 @@ public:
 //ka hozzadodik a komponens, akkoris ha árnyékban van
 //diffuz és spekulárishoz pedig kellenek shadowRayek
 class RoughMaterial : public Material {
-	vec3 kd, ks;
-	float  shininess;
 	float n, k;
 	
 public:
 	RoughMaterial(vec3 ka,vec3 kd, vec3 ks, float shininess, bool isReflect, bool isRefract)
 	{
-		this->materialType = TYPES::Smooth;
+		this->materialType = TYPES::Rough;
 		this->isReflect = isReflect;
 		this->isRefract = isRefract;
 		n = 0;
