@@ -15,8 +15,34 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Skeleton.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="VectorMath.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lights.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Intersectables.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayLogic_Hit.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventHandler_ErrorHandler.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FullScreenTexturedQuad.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

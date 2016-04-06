@@ -74,7 +74,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Skeleton.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EventHandler_ErrorHandler.h" />
+    <ClInclude Include="FullScreenTexturedQuad.h" />
+    <ClInclude Include="Intersectables.h" />
+    <ClInclude Include="Lights.h" />
+    <ClInclude Include="Materials.h" />
+    <ClInclude Include="RayLogic_Hit.h" />
+    <ClInclude Include="Types.h" />
+    <ClInclude Include="VectorMath.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
