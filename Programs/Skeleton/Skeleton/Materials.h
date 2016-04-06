@@ -35,7 +35,7 @@ struct Material
 
 		return inDir - normal * (dot(normal, inDir) * 2.0f);
 	}
-	virtual vec3 refract(vec3 &inDir, vec3 &normal);
+	//virtual vec3 refract(vec3 &inDir, vec3 &normal);
 
 	virtual void calcF0() {}
 
