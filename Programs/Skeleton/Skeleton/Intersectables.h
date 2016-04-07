@@ -154,7 +154,7 @@ public:
 				return Hit(); // Nincs talalat
 			Hit talalat;
 			talalat.t = t;
-			talalat.position = eye + v*t;  ///TODO Position nem mûködik
+			talalat.position = eye + v*t * -1;  ///TODO Position nem mûködik
 			talalat.normal = normal;  
 			talalat.material = material;
 			return talalat;
