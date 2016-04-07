@@ -25,6 +25,7 @@ public:
 		Hit talalat;
 		vec3 eye = ray._kozeppont;
 		vec3 v = ray._nezetiIrany;
+		v = v * -1.0f;
 
 		///TODO Rakerdezni
 		//Kovetkezo feltetelezessel elve: eye = ray._kozeppont, v = ray._nezetiIrany
