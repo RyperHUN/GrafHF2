@@ -16,7 +16,16 @@ struct vec3
 {
 	float x, y, z;
 
-	vec3(float x0 = 0, float y0 = 0, float z0 = 0) { x = x0; y = y0; z = z0; }
+	vec3()
+	{
+		x = 0.0f;
+		y = 0.0f;
+		z = 0.0f;
+	}
+	vec3(float x0, float y0, float z0) 
+	{ x = x0; y = y0; z = z0; }
+	vec3(const vec3&  v)
+	{ x = v.x; y = v.y; z = v.z; }
 	vec3 operator*(float a) { return vec3(x * a, y * a, z * a); }
 
 	vec3 operator+(const vec3& v) const {

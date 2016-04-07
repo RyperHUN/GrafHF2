@@ -140,22 +140,25 @@ public:
 	{
 		vec3 eye = ray._kozeppont;
 		vec3 v = ray._nezetiIrany; // -1???
+		v = v * (-1.0f);
 
 		float denom = dot(normal, v);
 		float t = -1;
 		if (denom > 1e-6) 
 		{
 			vec3 p0l0 = position - eye;
+			p0l0 = p0l0* -1;
 			t = dot(p0l0, normal) / denom;
 			if (t < 0)
 				return Hit(); // Nincs talalat
+			Hit talalat;
+			talalat.t = t;
+			talalat.position = eye + v*t;  ///TODO Position nem mûködik
+			talalat.normal = normal;  
+			talalat.material = material;
+			return talalat;
 		}
-		Hit talalat;
-		talalat.t = t;
-		talalat.position = eye + v*t;
-		talalat.normal = normal;
-		talalat.material = material;
-		return talalat;
+		return Hit();
 	}
 
 };
