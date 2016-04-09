@@ -209,7 +209,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 110 && y >= windowHeight - 330)
+				if (x >= 350 && y >= windowHeight - 231)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -220,32 +220,6 @@ struct Scene
 			}
 		}
 		return elkeszultKep;
-		//for each pixel of the screen
-		//{
-		//	Final color = 0;
-		//	Ray = { starting point, direction };
-		//	Repeat
-		//	{
-		//		5
-		//		for each object in the scene
-		//		{
-		//			determine closest ray object / intersection;
-		//		}
-		//			if intersection exists
-		//			{
-		//				for each light in the scene
-		//				{
-		//					if the light is not in shadow of another object
-		//					{
-		//						add this light contribution to computed color;
-		//					}
-		//				}
-		//			}
-		//		Final color = Final color + computed color * previous reflection factor;
-		//		reflection factor = reflection factor * surface reflection property;
-		//		increment depth;
-		//	} until reflection factor is 0 or maximum depth is reached;
-		//}
 	}
 	///TODO atnezni parametrizalni
 	void setCamera()
@@ -287,14 +261,31 @@ void onInitialization() {
 	Sphere* sphere = new Sphere(-0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	Sphere* sphere2 = new Sphere(+0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	Sphere* sphere3 = new Sphere(0.0f, 0, -2.0f, 0.3f); ///TODO felszabaditani.
-	Plane* plane = new Plane(vec3(0, -1, 0), vec3(0, 1, 0), fuAnyagaSik);
-	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.8f, 0, -1), vec3(0.5f, 0.8f, 0.8f), fuAnyaga);
-	Ellipsoid* ellipsoid2 = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
-	Ellipsoid* ellipsoid3 = new Ellipsoid(vec3(0.0f, 0, -2.0f), vec3(0.3f, 0.3f, 0.3f), ezustAnyaga);
-	
 	sphere->material = aranyAnyaga;
 	sphere2->material = fuAnyaga;
 	sphere3->material = ezustAnyaga;
+	Plane* plane = new Plane(vec3(0, -1, 0), vec3(0, 1, 0), fuAnyagaSik);
+	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.8f, 0, -1), vec3(0.5f, 0.8f, 0.8f), fuAnyaga);
+	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
+	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(0.0f, 0, -2.0f), vec3(0.3f, 0.3f, 0.3f), ezustAnyaga);
+
+	vec3 p1(1, 1, -1);
+	vec3 p2(1.5f, 2, -1.5f);
+	vec3 p3(0.5f, 2, -1.5f);
+	vector<vec3> haromszogPontok;
+	haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
+	haromszogPontok.push_back(vec3(2.0f, 2, -4.0f));
+	haromszogPontok.push_back(vec3(0.5f, 2, -4.0f));
+
+	haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
+	haromszogPontok.push_back(vec3(1.0f, 0.5f, -4.0f));
+	haromszogPontok.push_back(vec3(2.0f, 2, -4.0f));
+
+	//haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
+	//haromszogPontok.push_back(vec3(1.0f, 0.5f, -4.0f));
+	//haromszogPontok.push_back(vec3(0.5f, 2, -4.0f));
+
+	Polygonf* triangle = new Polygonf(haromszogPontok, fuAnyaga);
 
 
 	//objects.push_back(sphere);
@@ -302,8 +293,9 @@ void onInitialization() {
 	//objects.push_back(sphere3);
 	objects.push_back(plane);
 	objects.push_back(ellipsoid);
-	objects.push_back(ellipsoid2);
-	objects.push_back(ellipsoid3);
+	//objects.push_back(ellipsoidArany);
+	objects.push_back(ellipsoidEzust);
+	objects.push_back(triangle);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();

@@ -271,4 +271,61 @@ public:
 
 };
 
-///TODO teglalap vagy sik
+//Pontok megadasanal a koruljarasi irany a lenyeg. JOBBKEZSZABALY!
+class Polygonf : public Intersectable
+{
+	vector<vec3> points;
+	public:
+	Polygonf(std::vector<vec3> points, Material* material)
+	{
+		this->points = points;
+		this->material = material;
+	}
+
+	Hit intersect(const Ray& ray)
+	{
+		vec3 eye = ray._kozeppont;
+		vec3 v = ray._nezetiIrany;
+
+		Hit bestHit;
+		for (int i = 0; i < points.size() / 3; i++)
+		{
+			vec3 r1 = points[i*3 + 0];
+			vec3 r2 = points[i * 3 + 1];
+			vec3 r3 = points[i * 3 + 2];
+			vec3 normal = cross((r2 - r1), (r3 - r1)); ///Normálvektor irány mitõl függ??
+			normal = normal.normalize();
+
+			float t = dot((r1 - eye), normal) / dot(v, normal);
+
+			if (t < 0)
+				continue; // nincs talalat
+			if (t < bestHit.t) // Ha mar van jobb talalat
+				continue;
+
+			vec3 p = eye + v*t;
+
+			float teszt = dot(cross((r2 - r1), (p - r1)), normal);
+			if (teszt > 0)
+			{
+				teszt = dot(cross((r3 - r2), (p - r2)), normal);
+				if (teszt > 0)
+				{
+					teszt = dot(cross((r1 - r3), (p - r3)), normal);
+					if (teszt > 0)
+					{
+						//Háromszögbe vagyunk
+						Hit talalat;
+						talalat.normal = normal.normalize();
+						talalat.t = t;
+						talalat.material = this->material;
+						talalat.position = p;
+						
+						bestHit = talalat;
+					}
+				}
+			}
+		}
+		return bestHit;
+	}
+};
