@@ -328,4 +328,13 @@ class Polygonf : public Intersectable
 		}
 		return bestHit;
 	}
+	void eltol(vec3 eltolas)
+	{
+		mat4 eltolasMatrix;
+		eltolasMatrix.eltolas(eltolas.x, eltolas.y, eltolas.z);
+		for (int i = 0; i < points.size(); i++)
+		{
+			points[i] = eltolasMatrix * points[i];
+		}
+	}
 };

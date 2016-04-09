@@ -274,19 +274,19 @@ void onInitialization() {
 	vec3 p3(0.5f, 2, -1.5f);
 	vector<vec3> haromszogPontok;
 	haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
-	haromszogPontok.push_back(vec3(2.0f, 2, -4.0f));
-	haromszogPontok.push_back(vec3(0.5f, 2, -4.0f));
-
-	haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
-	haromszogPontok.push_back(vec3(1.0f, 0.5f, -4.0f));
-	haromszogPontok.push_back(vec3(2.0f, 2, -4.0f));
+	haromszogPontok.push_back(vec3(2.0f, 2, -3.0f));
+	haromszogPontok.push_back(vec3(0.5f, 2, -3.0f));
 
 	//haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
-	//haromszogPontok.push_back(vec3(1.0f, 0.5f, -4.0f));
-	//haromszogPontok.push_back(vec3(0.5f, 2, -4.0f));
+	//haromszogPontok.push_back(vec3(1.0f, 0.5f, -3.0f));
+	//haromszogPontok.push_back(vec3(2.0f, 2, -3.0f));
+
+	haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
+	haromszogPontok.push_back(vec3(1.0f, 0.5f, -3.0f));
+	haromszogPontok.push_back(vec3(0.5f, 2, -3.0f));
 
 	Polygonf* triangle = new Polygonf(haromszogPontok, fuAnyaga);
-
+	triangle->eltol(vec3(1.2f, 0, 0));
 
 	//objects.push_back(sphere);
 	//objects.push_back(sphere2);
