@@ -136,14 +136,14 @@ vec3 trace(Ray ray, int depth) {
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 
 
-	float kicsinyitesNagysaga = 2.0f;
+	float kicsinyitesNagysaga = 3.0f;
 	vec3 outRadiance = vec3(0, 0, 0);
 	if (hit.material->materialType == TYPES::Rough)
 	{
 		outRadiance = hit.material->ka * ambiensFeny.LightColor;
 		
 		//for (each light source l) {
-		vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany* -1, hit.normal)));
+		vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany * -1.0f, hit.normal)));
 		Neps = Neps.normalize();
 		Neps = Neps / kicsinyitesNagysaga;
 		vec3 fenyIranya = nap.position - hit.position; // Ellentetes ez a nap fele mutat
@@ -152,16 +152,15 @@ vec3 trace(Ray ray, int depth) {
 		Ray shadowRay(hit.position + Neps, fenyIranya);  
 		Hit shadowHit = firstIntersect(shadowRay);
 		if (shadowHit.t < 0 || shadowHit.t >  (hit.position - nap.position).Length()  )
-			outRadiance = outRadiance + hit.material->shade(hit.normal, ray._nezetiIrany* -1, fenyIranya, nap.LightColor);
+			outRadiance = outRadiance + hit.material->shade(hit.normal, ray._nezetiIrany* -1.0f, fenyIranya, nap.LightColor);
 	}
 	else if (hit.material->materialType == TYPES::Smooth)
 	{
 		///Todo megcsinalni hogy tukrozodjon az arany!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (hit.material->isReflective()) {
 			vec3 reflectionDir = hit.material->reflect(ray._nezetiIrany, hit.normal);  // Beérkezési irány, Normál vektora a felületnek
-
 			
-			vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany, hit.normal)));
+			vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany * -1.0f, hit.normal)));
 			Neps = Neps.normalize();
 			Neps = Neps / kicsinyitesNagysaga;
 			vec3 visszaverPos = hit.position;
@@ -209,9 +208,10 @@ struct Scene
 			for (int y = 0; y < windowHeight; y++) {
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
-
-				vec3 vegsoSzin = vec3(0,0,0);
-				///TODO repeat
+				vec3 vegsoSzin = vec3(0, 0, 0);
+				if (x >= 110 && y >= windowHeight - 330)
+					vegsoSzin = vec3(1, 0, 0);
+				//else
 				{
 					vegsoSzin = trace(ray,0);
 				}
@@ -278,7 +278,7 @@ void onInitialization() {
 	
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK,true, false);  ///TODO felszabaditani
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
-	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.0f, 0.2f, 0.0f), vec3(0.1, 0.9f, 0.1), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
+	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.0f, 0.2f, 0.0f), vec3(0.1, 0.9f, 0.1), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
 	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
 	//aranyAnyaga->color = AranyColor;///Beta szín
 

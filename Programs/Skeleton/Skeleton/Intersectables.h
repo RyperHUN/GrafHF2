@@ -72,21 +72,24 @@ public:
 		float b = 2 * dot(eye - center, v);
 		float c = dot(eye - center, eye - center) - radius* radius;
 
-		float det = b*b - 4 * a *c;
+		float det = (b*b) - (4 * a *c);
 		if (det < 0)
 			return Hit();
 
 		Hit hit;
-		float t = (-b - sqrt(det)) / (2 * a);
-		if (t > 0)
-			hit.t = t;
+		float t1 = (-b - sqrt(det)) / (2 * a);
+		float t2 = (+b + sqrt(det)) / (2 * a);
+		if (t1 > 0 && t1 > t2)
+			hit.t = t1;
 		else
 		{
-			t = (+b + sqrt(det)) / (2 * a);
-			if (t < 0) return Hit();
-			hit.t = t;
+			if (t2 < 0) return Hit();
+			hit.t = t2;
 		}
+		
 		hit.position = eye + v*hit.t;
+		if (hit.position.y > 0.0f)
+			hit.normal.y = 0.0f; // csak hogy legyen break point amikor ütközik anormal gömbel
 		hit.normal = (hit.position - center) / radius;
 		hit.normal = hit.normal.normalize();
 		hit.material = material;
@@ -151,6 +154,78 @@ public:
 	//	return hit;
 	//}
 
+};
+
+class Ellipsoid : Intersectable
+{
+	vec3 center;
+	vec3 size;
+	Ellipsoid(vec3 center, vec3 size,Material* material)
+		: center(center),size(size)
+	{
+		this->material = material;
+	}
+	Hit intersect(const Ray& ray)
+	{
+		float EPSILON = 0; ///TODO IDE LEHET MAS KENE
+		vec3 O_C = ray._kozeppont - center;
+		vec3 dir = ray._nezetiIrany;
+		dir = dir.normalize();
+
+		float a =
+			((dir.x*dir.x) / (size.x*size.x))
+			+ ((dir.y*dir.y) / (size.y*size.y))
+			+ ((dir.z*dir.z) / (size.z*size.z));
+		float b =
+			((2.f*O_C.x*dir.x) / (size.x*size.x))
+			+ ((2.f*O_C.y*dir.y) / (size.y*size.y))
+			+ ((2.f*O_C.z*dir.z) / (size.z*size.z));
+		float c =
+			((O_C.x*O_C.x) / (size.x*size.x))
+			+ ((O_C.y*O_C.y) / (size.y*size.y))
+			+ ((O_C.z*O_C.z) / (size.z*size.z))
+			- 1.f;
+
+		float d = ((b*b) - (4.f*a*c));
+		if (d < 0.f || a == 0.f || b == 0.f || c == 0.f)
+			return Hit();
+
+		d = sqrt(d);
+
+		float t1 = (-b + d) / (2.f*a);
+		float t2 = (-b - d) / (2.f*a);
+
+		if (t1 <= EPSILON && t2 <= EPSILON) return Hit(); // both intersections are behind the ray origin
+		bool back = (t1 <= EPSILON || t2 <= EPSILON); // If only one intersection (t>0) then we are inside the ellipsoid and the intersection is at the back of the ellipsoid
+		float t = 0.f;
+		if (t1 <= EPSILON)
+			t = t2;
+		else
+			if (t2 <= EPSILON)
+				t = t1;
+			else
+				t = (t1 < t2) ? t1 : t2;
+
+		if (t < EPSILON) return Hit(); // Too close to intersection
+
+		Hit talalat;
+		talalat.position = ray._kozeppont + dir*t;
+		talalat.t = t;
+		vec3 normal = talalat.position - center;
+		normal.x = 2.f*normal.x / (size.x*size.x);
+		normal.y = 2.f*normal.y / (size.y*size.y);
+		normal.z = 2.f*normal.z / (size.z*size.z);
+
+		normal = (back) ? normal * -1.f : normal * 1.f;
+		normal = normal.normalize();
+		
+		talalat.normal = normal;
+		talalat.material = this->material;
+		
+		return talalat;
+		///TODO
+		/// http://cudaopencl.blogspot.hu/2012/12/ellipsoids-finally-added-to-ray-tracing.html
+	}
 };
 
 class Plane : public Intersectable
