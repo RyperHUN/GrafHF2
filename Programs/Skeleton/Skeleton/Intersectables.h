@@ -156,10 +156,11 @@ public:
 
 };
 
-class Ellipsoid : Intersectable
+class Ellipsoid : public Intersectable
 {
 	vec3 center;
 	vec3 size;
+public:
 	Ellipsoid(vec3 center, vec3 size,Material* material)
 		: center(center),size(size)
 	{

@@ -280,23 +280,25 @@ void onInitialization() {
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
 	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.0f, 0.2f, 0.0f), vec3(0.1, 0.9f, 0.1), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
 	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
-	//aranyAnyaga->color = AranyColor;///Beta szín
 
 	Sphere* sphere = new Sphere(-0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
-	sphere->material = aranyAnyaga;
-	objects.push_back(sphere);
 	Sphere* sphere2 = new Sphere(+0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
-	
-	sphere2->material = fuAnyaga;
-	objects.push_back(sphere2);
-
 	Sphere* sphere3 = new Sphere(0.0f, 0, -2.0f, 0.3f); ///TODO felszabaditani.
-	sphere3->material = ezustAnyaga;
-	objects.push_back(sphere3);
-
 	Plane* plane = new Plane(vec3(0, -1, 0), vec3(0, 1, 0), fuAnyagaSik);
-	objects.push_back(plane);
+	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.8f, 0, -1), vec3(0.5f, 0.8f, 0.8f), fuAnyaga);
+	Ellipsoid* ellipsoid2 = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
+	
+	sphere->material = aranyAnyaga;
+	sphere2->material = fuAnyaga;
+	sphere3->material = ezustAnyaga;
 
+
+	//objects.push_back(sphere);
+	//objects.push_back(sphere2);
+	//objects.push_back(sphere3);
+	objects.push_back(plane);
+	objects.push_back(ellipsoid);
+	objects.push_back(ellipsoid2);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();
