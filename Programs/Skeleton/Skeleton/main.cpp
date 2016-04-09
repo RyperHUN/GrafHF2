@@ -216,7 +216,7 @@ struct Scene
 					vegsoSzin = trace(ray,0);
 				}
 
-				elkeszultKep[y * windowWidth + x] = vec4(vegsoSzin.x, vegsoSzin.y, vegsoSzin.y, 1);
+				elkeszultKep[y * windowWidth + x] = vec4(vegsoSzin.x, vegsoSzin.y, vegsoSzin.z, 1);
 			}
 		}
 		return elkeszultKep;
@@ -279,14 +279,18 @@ void onInitialization() {
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK,true, false);  ///TODO felszabaditani
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
 	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.0f, 0.2f, 0.0f), vec3(0.1, 0.9f, 0.1), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
-	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
+	//RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2f, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
 
+	///Valamiert a budos eletbe se tudok elohozni zold szint neki
+	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.0f, 0.2f, 0.1f), vec3(0.0f, 0.3f, 0.1f), vec3(0.0f, 0.2f, 0.0f), 100, false, false);///TODO felszabaditani
+	
 	Sphere* sphere = new Sphere(-0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	Sphere* sphere2 = new Sphere(+0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	Sphere* sphere3 = new Sphere(0.0f, 0, -2.0f, 0.3f); ///TODO felszabaditani.
 	Plane* plane = new Plane(vec3(0, -1, 0), vec3(0, 1, 0), fuAnyagaSik);
 	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.8f, 0, -1), vec3(0.5f, 0.8f, 0.8f), fuAnyaga);
 	Ellipsoid* ellipsoid2 = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
+	Ellipsoid* ellipsoid3 = new Ellipsoid(vec3(0.0f, 0, -2.0f), vec3(0.3f, 0.3f, 0.3f), ezustAnyaga);
 	
 	sphere->material = aranyAnyaga;
 	sphere2->material = fuAnyaga;
@@ -299,6 +303,7 @@ void onInitialization() {
 	objects.push_back(plane);
 	objects.push_back(ellipsoid);
 	objects.push_back(ellipsoid2);
+	objects.push_back(ellipsoid3);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();
