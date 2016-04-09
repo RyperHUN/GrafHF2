@@ -20,47 +20,78 @@ public:
 
 	}
 	
+	//Hit intersect(const Ray& ray)
+	//{
+	//	Hit talalat;
+	//	vec3 eye = ray._kozeppont;
+	//	vec3 v = ray._nezetiIrany;
+	//	//v = v * -1.0f;
+
+	//	///TODO Rakerdezni
+	//	//Kovetkezo feltetelezessel elve: eye = ray._kozeppont, v = ray._nezetiIrany
+	//	float a = (dot(v, v));
+	//	float b = 2 * (dot((eye - center), v));
+	//	float c = dot((eye - center), (eye - center)) - radius*radius;
+	//	//Masodfoku egyenlet parameterei
+	//	float diszkriminans = b*b - 4 * a * c;
+	//	if (diszkriminans < 0) // nincs talalat
+	//		return talalat; //Defaultbol -1 tehat nincs talalat
+
+	//	float t1 = (-b + sqrtf(diszkriminans)) / (2 * a);
+	//	float t2 = (-b - sqrtf(diszkriminans)) / (2 * a);
+	//	///TODO x1, x2 itt mi lesz???? - Talan a tavolsag a szemtol a metszespontal
+	//	///TODO HIT.Position.
+	//	talalat.material = this->material;
+	//	//v = v * -1;
+	//	if (t1 > t2 && t1 > 0)
+	//	{
+	//		talalat.t = t1;
+	//		talalat.position = eye + v  * talalat.t;
+	//		talalat.normal = (talalat.position - center) / radius;
+	//		talalat.normal = talalat.normal.normalize();
+	//		return talalat;
+	//	}
+	//	else if( t2 > 0)
+	//	{
+	//		talalat.t = t2;
+	//		talalat.position = eye + v * talalat.t;
+	//		talalat.normal = (talalat.position - center) / radius;
+	//		talalat.normal = talalat.normal.normalize();
+	//		return talalat;
+	//	}
+
+	//}
+	
 	Hit intersect(const Ray& ray)
 	{
-		Hit talalat;
 		vec3 eye = ray._kozeppont;
 		vec3 v = ray._nezetiIrany;
-		v = v * -1.0f;
+		//v = v * -1.0f;
 
-		///TODO Rakerdezni
-		//Kovetkezo feltetelezessel elve: eye = ray._kozeppont, v = ray._nezetiIrany
-		float a = (dot(v, v));
-		float b = 2 * (dot((eye - center), v));
-		float c = dot((eye - center), (eye - center)) - radius*radius;
-		//Masodfoku egyenlet parameterei
-		float diszkriminans = b*b - 4 * a * c;
-		if (diszkriminans < 0) // nincs talalat
-			return talalat; //Defaultbol -1 tehat nincs talalat
+		float a = dot(v, v);
+		float b = 2 * dot(eye - center, v);
+		float c = dot(eye - center, eye - center) - radius* radius;
 
-		float t1 = (-b + sqrtf(diszkriminans)) / (2 * a);
-		float t2 = (+b + sqrtf(diszkriminans)) / (2 * a);
-		///TODO x1, x2 itt mi lesz???? - Talan a tavolsag a szemtol a metszespontal
-		///TODO HIT.Position.
-		talalat.material = this->material;
-		if (t1 > t2 && t1 > 0)
+		float det = b*b - 4 * a *c;
+		if (det < 0)
+			return Hit();
+
+		Hit hit;
+		float t = (-b - sqrt(det)) / (2 * a);
+		if (t > 0)
+			hit.t = t;
+		else
 		{
-			talalat.t = t1;
-			talalat.position = eye + v * talalat.t;
-			talalat.normal = (talalat.position - center) / radius;
-			talalat.normal = talalat.normal.normalize();
-			return talalat;
+			t = (+b + sqrt(det)) / (2 * a);
+			if (t < 0) return Hit();
+			hit.t = t;
 		}
-		else if( t2 > 0)
-		{
-			talalat.t = t2;
-			talalat.position = eye + v * talalat.t;
-			talalat.normal = (talalat.position - center) / radius;
-			talalat.normal = talalat.normal.normalize();
-			return talalat;
-		}
-
+		hit.position = eye + v*hit.t;
+		hit.normal = (hit.position - center) / radius;
+		hit.normal = hit.normal.normalize();
+		hit.material = material;
+		return hit;
 	}
-	
 
 	/* Kopari
 	Hit intersect(const Ray& ray)

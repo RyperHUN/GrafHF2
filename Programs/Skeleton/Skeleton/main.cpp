@@ -136,7 +136,7 @@ vec3 trace(Ray ray, int depth) {
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 
 
-	float kicsinyitesNagysaga = 7.0f;
+	float kicsinyitesNagysaga = 2.0f;
 	vec3 outRadiance = vec3(0, 0, 0);
 	if (hit.material->materialType == TYPES::Rough)
 	{
@@ -274,13 +274,15 @@ void onInitialization() {
 	vec3 AranyK(3.1f, 2.7f, 1.9f);
 
 	vec3 AranyColor(1, 0.8431372549f, 0); // Arany szine
-	Sphere* sphere = new Sphere(-0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
+	
 	
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK,true, false);  ///TODO felszabaditani
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
 	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.0f, 0.2f, 0.0f), vec3(0.1, 0.9f, 0.1), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
 	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
 	//aranyAnyaga->color = AranyColor;///Beta szín
+
+	Sphere* sphere = new Sphere(-0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	sphere->material = aranyAnyaga;
 	objects.push_back(sphere);
 	Sphere* sphere2 = new Sphere(+0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
