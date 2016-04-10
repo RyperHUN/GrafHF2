@@ -136,7 +136,7 @@ vec3 trace(Ray ray, int depth) {
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 
 
-	float kicsinyitesNagysaga = 3.0f;
+	float kicsinyitesNagysaga = 10.0f;
 	vec3 outRadiance = vec3(0, 0, 0);
 	if (hit.material->materialType == TYPES::Rough)
 	{
@@ -209,7 +209,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 350 && y >= windowHeight - 231)
+				if (x >= 281 && y >= windowHeight - 339)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -252,12 +252,13 @@ void onInitialization() {
 	
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK,true, false);  ///TODO felszabaditani
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
-	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.0f, 0.2f, 0.0f), vec3(0.1, 0.9f, 0.1), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
+	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.4f, 0.2f, 0.0f), vec3(0.4f, 0.1f, 0.1), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
 	//RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2f, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
 
 	///Valamiert a budos eletbe se tudok elohozni zold szint neki
 	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.0f, 0.2f, 0.1f), vec3(0.0f, 0.3f, 0.1f), vec3(0.0f, 0.2f, 0.0f), 100, false, false);///TODO felszabaditani
-	
+	RoughMaterial* medenceAnyaga = new RoughMaterial(vec3(0.0f, 0.4f, 0.4f), vec3(0.0f, 0.2f, 0.2f), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
+
 	Sphere* sphere = new Sphere(-0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	Sphere* sphere2 = new Sphere(+0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	Sphere* sphere3 = new Sphere(0.0f, 0, -2.0f, 0.3f); ///TODO felszabaditani.
@@ -269,33 +270,57 @@ void onInitialization() {
 	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
 	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(0.0f, 0, -2.0f), vec3(0.3f, 0.3f, 0.3f), ezustAnyaga);
 
-	vec3 p1(1, 1, -1);
-	vec3 p2(1.5f, 2, -1.5f);
-	vec3 p3(0.5f, 2, -1.5f);
-	vector<vec3> haromszogPontok;
-	haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
-	haromszogPontok.push_back(vec3(2.0f, 2, -3.0f));
-	haromszogPontok.push_back(vec3(0.5f, 2, -3.0f));
+	vector<vec3> medencePontok;
+	medencePontok.push_back(vec3(-1.0f, -0.5f, 0)); //Bal oldala
+	medencePontok.push_back(vec3(-1.0f, -1.0f, 0));
+	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
 
-	//haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
-	//haromszogPontok.push_back(vec3(1.0f, 0.5f, -3.0f));
-	//haromszogPontok.push_back(vec3(2.0f, 2, -3.0f));
+	medencePontok.push_back(vec3(-1.0f, -0.5f, 0));
+	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
+	medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));
 
-	haromszogPontok.push_back(vec3(0.2f, 0.2f, -0.5));
-	haromszogPontok.push_back(vec3(1.0f, 0.5f, -3.0f));
-	haromszogPontok.push_back(vec3(0.5f, 2, -3.0f));
+	medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Hatulja
+	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
+	medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+	
+	medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Hatulja
+	medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+	medencePontok.push_back(vec3(1.0f, -0.5f, -1.0f));
 
-	Polygonf* triangle = new Polygonf(haromszogPontok, fuAnyaga);
-	triangle->eltol(vec3(1.2f, 0, 0));
+	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
+	medencePontok.push_back(vec3(1.0f, -1.0f, 0));
+	medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+	
+	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
+	medencePontok.push_back(vec3(-1.0f, -1.0f, 0.0f));
+	medencePontok.push_back(vec3(1.0f, -1.0f, 0));
+	
+	vector<vec3> teglalapPontok;
+	teglalapPontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
+	teglalapPontok.push_back(vec3(-1.0f, -1.0f, 0));
+	teglalapPontok.push_back(vec3(1.0f, -1.0f, 0));
+	teglalapPontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+	Rectanglef* teglalapTeszt = new Rectanglef(teglalapPontok, medenceAnyaga);
+	teglalapTeszt->eltol(vec3(0.2f, -0.1f, -0.5f));
+	
+
+
+	Polygonf* medence = new Polygonf(medencePontok, medenceAnyaga);
+	medence->eltol(vec3(0.2f, -0.2f, -0.4f));
+
+
+
+	
 
 	//objects.push_back(sphere);
 	//objects.push_back(sphere2);
 	//objects.push_back(sphere3);
-	objects.push_back(plane);
+	//objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidArany);
 	objects.push_back(ellipsoidEzust);
-	objects.push_back(triangle);
+	//objects.push_back(medence);
+	objects.push_back(teglalapTeszt);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();
