@@ -234,12 +234,15 @@ class Plane : public Intersectable
 public: 
 	vec3 normal;
 	vec3 position;
+	bool kivag;
+	vector<Intersectable*> kivagniObjektumok;
 	Plane(vec3 position, vec3 normal,Material * material)
 	{
 		///Egyellore csak (0,0,0) al mûködik
 		this->position = position;
 		this->normal = normal;
 		this->material = material;
+		this->kivag = false;
 	}
 	/*
 		Mi a francért nem jó???
@@ -264,7 +267,20 @@ public:
 			talalat.position = eye + v*t * -1;  ///TODO Position nem mûködik
 			talalat.normal = normal;  
 			talalat.material = material;
-			return talalat;
+			if (kivag)
+			{
+				for (int i = 0; i < kivagniObjektumok.size(); i++)
+				{
+					Hit kivagTalalat = kivagniObjektumok[i]->intersect(ray);
+					if (kivagTalalat.t > 0)
+						return Hit();
+				}
+				return talalat; //Ha egyik objektumba sincs benne!
+			}
+			else
+			{
+				return talalat;
+			}
 		}
 		return Hit();
 	}

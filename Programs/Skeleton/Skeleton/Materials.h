@@ -91,31 +91,21 @@ public:
 
 		return inDir - normal * dot(normal, inDir) * 2.0f;
 	}
-	///TODO at kene irni hogy mukodjon vec3 n el! bár lehet nincs rá szükség vízhez kell majd
-	//vec3 refract(vec3 inDir, vec3 normal) {
-	//	if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
-	//	{
-	//		inDir = inDir.normalize();
-	//		normal = normal.normalize();
-	//		throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
-	//	}
+	///TODO egyellore csak 1 n el mûködik
+	vec3 refract(vec3 inDir, vec3 normal) {
+		float ior = n.x;
+		float cosa = -dot(normal, inDir);
+		if (cosa < 0) 
+		{ 
+			cosa = -cosa;
+			normal = normal * -1.0f;
+			ior = 1 / ior;
+		}
+		float disc = 1 - (1 - cosa * cosa) / ior / ior;
+		if (disc < 0) return reflect(inDir, normal);
+		return inDir / ior + normal * (cosa / ior - sqrtf(disc));
+	}
 
-	//	vec3 ior = n;
-	//	float cosa = -dot(normal, inDir);
-	//	if (cosa < 0)
-	//	{
-	//		cosa = -cosa;
-	//		//normal = -normal; // "-normal" kell ide
-	//		normal = vec3(-normal.x, -normal.y, -normal.z);
-	//		//ior = 1 / n; // Kovetkezo sorban mashogy megoldva
-	//		ior = vec3(1 / n.x, 1 / n.y, 1 / n.z);
-	//	}
-	//	float cos_magic = (1 - cosa * cosa);
-	//	vec3 cos_vec = vec3(cos_magic, cos_magic, cos_magic);
-	//	vec3 disc = vec3(1,1,1) - cos_vec / (ior*ior);
-	//	if (disc < 0) return reflect(inDir, normal);
-	//	return inDir / ior + normal * (cosa / ior - sqrt(disc));
-	//}
 	vec3 Fresnel(vec3 inDir, vec3 normal) {
 		inDir = inDir.normalize();
 		normal = normal.normalize();

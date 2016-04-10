@@ -265,7 +265,7 @@ void onInitialization() {
 	sphere->material = aranyAnyaga;
 	sphere2->material = fuAnyaga;
 	sphere3->material = ezustAnyaga;
-	Plane* plane = new Plane(vec3(0, -1, 0), vec3(0, 1, 0), fuAnyagaSik);
+	Plane* plane = new Plane(vec3(0, -0.5f, 0), vec3(0, 1, 0), fuAnyagaSik);
 	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), fuAnyaga);
 	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
 	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(0.0f, 0.2f, -2.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
@@ -325,14 +325,23 @@ void onInitialization() {
 	
 	
 
-
+	vec3 medenceEltolas(0.2f, 0.0f, 0);
 	Rectanglef* teglalapTeszt = new Rectanglef(teglalapPontok, medenceAnyaga);
-	teglalapTeszt->eltol(vec3(0.2f, 0.0f, -0.5f));
+	teglalapTeszt->eltol(medenceEltolas);
 	
+	vector<vec3> medenceTetejePontok;
+	medenceTetejePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Teteje
+	medenceTetejePontok.push_back(vec3(-1.0f, -0.5f, 0));
+	medenceTetejePontok.push_back(vec3(1.0f, -0.5f, 0));
+	medenceTetejePontok.push_back(vec3(1.0f, -0.5f, -1.0f));
+	Rectanglef* medenceTeteje = new Rectanglef(medenceTetejePontok, medenceAnyaga);
+	medenceTeteje->eltol(medenceEltolas);
+	plane->kivag = true;
+	plane->kivagniObjektumok.push_back(medenceTeteje);
 
 
-	Polygonf* medence = new Polygonf(medencePontok, medenceAnyaga);
-	medence->eltol(vec3(0.2f, -0.2f, -0.4f));
+	//Polygonf* medence = new Polygonf(medencePontok, medenceAnyaga);
+	//medence->eltol(vec3(0.2f, -0.2f, -0.4f));
 
 
 
@@ -341,7 +350,7 @@ void onInitialization() {
 	//objects.push_back(sphere);
 	//objects.push_back(sphere2);
 	//objects.push_back(sphere3);
-	//objects.push_back(plane); ///TODO plane bol kivagni a medencet
+	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidArany);
 	objects.push_back(ellipsoidEzust);
