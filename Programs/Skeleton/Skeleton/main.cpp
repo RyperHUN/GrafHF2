@@ -209,7 +209,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 281 && y >= windowHeight - 339)
+				if (x >= 282 && y >= windowHeight - 411)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -266,42 +266,68 @@ void onInitialization() {
 	sphere2->material = fuAnyaga;
 	sphere3->material = ezustAnyaga;
 	Plane* plane = new Plane(vec3(0, -1, 0), vec3(0, 1, 0), fuAnyagaSik);
-	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.8f, 0, -1), vec3(0.5f, 0.8f, 0.8f), fuAnyaga);
+	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), fuAnyaga);
 	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
-	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(0.0f, 0, -2.0f), vec3(0.3f, 0.3f, 0.3f), ezustAnyaga);
+	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(0.0f, 0.2f, -2.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
 
 	vector<vec3> medencePontok;
-	medencePontok.push_back(vec3(-1.0f, -0.5f, 0)); //Bal oldala
-	medencePontok.push_back(vec3(-1.0f, -1.0f, 0));
-	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
+	{
+		medencePontok.push_back(vec3(-1.0f, -0.5f, 0)); //Bal oldala
+		medencePontok.push_back(vec3(-1.0f, -1.0f, 0));
+		medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
 
-	medencePontok.push_back(vec3(-1.0f, -0.5f, 0));
-	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
-	medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));
+		medencePontok.push_back(vec3(-1.0f, -0.5f, 0));
+		medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
+		medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));
 
-	medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Hatulja
-	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
-	medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
-	
-	medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Hatulja
-	medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
-	medencePontok.push_back(vec3(1.0f, -0.5f, -1.0f));
+		medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Hatulja
+		medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
+		medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
 
-	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
-	medencePontok.push_back(vec3(1.0f, -1.0f, 0));
-	medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
-	
-	medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
-	medencePontok.push_back(vec3(-1.0f, -1.0f, 0.0f));
-	medencePontok.push_back(vec3(1.0f, -1.0f, 0));
-	
+		medencePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Hatulja
+		medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+		medencePontok.push_back(vec3(1.0f, -0.5f, -1.0f));
+
+		medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
+		medencePontok.push_back(vec3(1.0f, -1.0f, 0));
+		medencePontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+
+		medencePontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
+		medencePontok.push_back(vec3(-1.0f, -1.0f, 0.0f));
+		medencePontok.push_back(vec3(1.0f, -1.0f, 0));
+	}
 	vector<vec3> teglalapPontok;
 	teglalapPontok.push_back(vec3(-1.0f, -1.0f, -1.0f));  //alja
 	teglalapPontok.push_back(vec3(-1.0f, -1.0f, 0));
 	teglalapPontok.push_back(vec3(1.0f, -1.0f, 0));
 	teglalapPontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+
+	teglalapPontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Hatulja
+	teglalapPontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
+	teglalapPontok.push_back(vec3( 1.0f, -1.0f, -1.0f));
+	teglalapPontok.push_back(vec3( 1.0f, -0.5f, -1.0f));
+
+	teglalapPontok.push_back(vec3(-1.0f, -0.5f, 0)); //Bal oldala
+	teglalapPontok.push_back(vec3(-1.0f, -1.0f, 0));
+	teglalapPontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
+	teglalapPontok.push_back(vec3(-1.0f, -0.5f, -1.0f));
+
+	teglalapPontok.push_back(vec3(1.0f, -0.5f, 0)); //jobb oldala
+	teglalapPontok.push_back(vec3(1.0f, -1.0f, 0));
+	teglalapPontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+	teglalapPontok.push_back(vec3(1.0f, -0.5f, -1.0f));
+
+	///TODO nem jo a normálvektorja
+	teglalapPontok.push_back(vec3(-1.0f, -1.0f, 0));
+	teglalapPontok.push_back(vec3(-1.0f, -0.5f, 0));  //Eleje
+	teglalapPontok.push_back(vec3(1.0f, -0.5f, 0));
+	teglalapPontok.push_back(vec3(1.0f, -1.0f, 0));
+	
+	
+
+
 	Rectanglef* teglalapTeszt = new Rectanglef(teglalapPontok, medenceAnyaga);
-	teglalapTeszt->eltol(vec3(0.2f, -0.1f, -0.5f));
+	teglalapTeszt->eltol(vec3(0.2f, 0.0f, -0.5f));
 	
 
 
