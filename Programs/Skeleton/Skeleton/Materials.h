@@ -21,7 +21,6 @@ struct Material
 	vec3 kd, ks;  // Ks - anyag szine ! , Ks - spekularis resze, ami visszaverodik
 	float shininess;
 	//IDAIG
-	vec3 color;
 
 	bool isReflective() { return isReflect; }
 	bool isRefractive() { return isRefract; }
