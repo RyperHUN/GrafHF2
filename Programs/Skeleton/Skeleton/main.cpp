@@ -252,6 +252,7 @@ void onInitialization() {
 	
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK,true, false);  ///TODO felszabaditani
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
+	SmoothMaterial* vizAnyaga = new SmoothMaterial(vec3(1.33f, 1.33f, 1.33f), vec3(0, 0, 0), true, true);
 	RoughMaterial* roughAnyag = new RoughMaterial(vec3(0.5f, 0.2f, 0.2f), vec3(0.5f, 0.3f, 0.1f), vec3(1, 1, 1), 15, false, false);///TODO felszabaditani
 	//RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2f, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
 
@@ -340,7 +341,10 @@ void onInitialization() {
 	//medenceTeteje->skalaz(vec3(1, 1, 3.0f));
 	plane->kivag = true;
 	plane->kivagniObjektumok.push_back(medenceTeteje);
-	
+
+	vector<vec3> vizPontok = medenceTetejePontok;
+	Rectanglef* viz = new Rectanglef(vizPontok, vizAnyaga);
+	viz->eltol(medenceEltolas);
 
 
 	//Polygonf* medence = new Polygonf(medencePontok, medenceAnyaga);
@@ -359,6 +363,7 @@ void onInitialization() {
 	objects.push_back(ellipsoidEzust);
 	//objects.push_back(medence);
 	objects.push_back(teglalapTeszt);
+//	objects.push_back(viz);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();
