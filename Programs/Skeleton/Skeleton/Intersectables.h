@@ -353,6 +353,15 @@ class Polygonf : public Intersectable
 			points[i] = eltolasMatrix * points[i];
 		}
 	}
+	void skalaz(vec3 skalazo)
+	{
+		mat4 skalazMatrix;
+		skalazMatrix.projekcio(skalazo.x, skalazo.y, skalazo.z);
+		for (int i = 0; i < points.size(); i++)
+		{
+			points[i] = skalazMatrix * points[i];
+		}
+	}
 };
 
 class Rectanglef: public Intersectable
@@ -423,6 +432,15 @@ public:
 		for (int i = 0; i < points.size(); i++)
 		{
 			points[i] = eltolasMatrix * points[i];
+		}
+	}
+	void skalaz(vec3 skalazo)
+	{
+		mat4 skalazMatrix;
+		skalazMatrix.projekcio(skalazo.x, skalazo.y, skalazo.z);
+		for (int i = 0; i < points.size(); i++)
+		{
+			points[i] = skalazMatrix * points[i];
 		}
 	}
 };

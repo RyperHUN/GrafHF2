@@ -328,6 +328,7 @@ void onInitialization() {
 	vec3 medenceEltolas(0.2f, 0.0f, 0);
 	Rectanglef* teglalapTeszt = new Rectanglef(teglalapPontok, medenceAnyaga);
 	teglalapTeszt->eltol(medenceEltolas);
+	//teglalapTeszt->skalaz(vec3(1, 1, 1.0f));
 	
 	vector<vec3> medenceTetejePontok;
 	medenceTetejePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Teteje
@@ -336,14 +337,16 @@ void onInitialization() {
 	medenceTetejePontok.push_back(vec3(1.0f, -0.5f, -1.0f));
 	Rectanglef* medenceTeteje = new Rectanglef(medenceTetejePontok, medenceAnyaga);
 	medenceTeteje->eltol(medenceEltolas);
+	//medenceTeteje->skalaz(vec3(1, 1, 3.0f));
 	plane->kivag = true;
 	plane->kivagniObjektumok.push_back(medenceTeteje);
+	
 
 
 	//Polygonf* medence = new Polygonf(medencePontok, medenceAnyaga);
 	//medence->eltol(vec3(0.2f, -0.2f, -0.4f));
-
-
+	//vector<vec3> medencePontok = andrisMagic();
+	//Polygonf
 
 	
 
