@@ -271,6 +271,7 @@ void onInitialization() {
 	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), roughAnyag);
 	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
 	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(0.0f, 0.2f, -2.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
+	Ellipsoid* ellipsoidViz = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), vizAnyaga);
 
 	vector<vec3> medencePontok;
 	{
@@ -360,11 +361,12 @@ void onInitialization() {
 	//objects.push_back(sphere3);
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	objects.push_back(ellipsoid);
+	//objects.push_back(ellipsoidViz);
 	//objects.push_back(ellipsoidArany);
 	objects.push_back(ellipsoidEzust);
 	//objects.push_back(medence);
 	objects.push_back(teglalapTeszt);
-//	objects.push_back(viz);
+	objects.push_back(viz);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();

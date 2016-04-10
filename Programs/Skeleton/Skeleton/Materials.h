@@ -35,8 +35,7 @@ struct Material
 
 		return inDir - normal * (dot(normal, inDir) * 2.0f);
 	}
-	vec3 refract(vec3 &inDir, vec3 &normal) { return vec3(0, 0, 0); }
-
+	virtual vec3 refract(vec3 inDir, vec3 normal) = 0;
 	virtual void calcF0() {}
 
 	vec3 Fresnel(vec3 inDir, vec3 normal)
@@ -161,5 +160,9 @@ public:
 		if (cosDelta < 0)
 			return reflRad;
 		return reflRad + inRad * ks * pow(cosDelta, shininess);
+	}
+	vec3 refract(vec3 inDir, vec3 normal)
+	{
+		return vec3(0, 0, 0);
 	}
 };
