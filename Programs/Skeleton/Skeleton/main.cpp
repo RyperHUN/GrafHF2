@@ -252,7 +252,7 @@ void onInitialization() {
 	
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK,true, false);  ///TODO felszabaditani
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
-	RoughMaterial* fuAnyaga = new RoughMaterial(vec3(0.4f, 0.2f, 0.0f), vec3(0.4f, 0.1f, 0.1), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
+	RoughMaterial* roughAnyag = new RoughMaterial(vec3(0.5f, 0.2f, 0.2f), vec3(0.5f, 0.3f, 0.1f), vec3(1, 1, 1), 15, false, false);///TODO felszabaditani
 	//RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.2f, 0.2f, 0.2f), vec3(0.2f, 0.2f, 0.2f), vec3(1, 1, 1), 4, false, false);///TODO felszabaditani
 
 	///Valamiert a budos eletbe se tudok elohozni zold szint neki
@@ -263,10 +263,10 @@ void onInitialization() {
 	Sphere* sphere2 = new Sphere(+0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
 	Sphere* sphere3 = new Sphere(0.0f, 0, -2.0f, 0.3f); ///TODO felszabaditani.
 	sphere->material = aranyAnyaga;
-	sphere2->material = fuAnyaga;
+	sphere2->material = roughAnyag;
 	sphere3->material = ezustAnyaga;
 	Plane* plane = new Plane(vec3(0, -0.5f, 0), vec3(0, 1, 0), fuAnyagaSik);
-	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), fuAnyaga);
+	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), roughAnyag);
 	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.2f, -1), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
 	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(0.0f, 0.2f, -2.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
 
