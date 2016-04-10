@@ -170,17 +170,18 @@ vec3 trace(Ray ray, int depth) {
 			outRadiance = outRadiance + trace(reflectedRay,depth + 1) * fresnel;
 		}
 		///TODO ez majd viznek kell!
-		//if (hit.material->isRefractive()) {
-		//	vec3 refractionDir = hit.material->refract(ray._nezetiIrany, hit.normal);
-		//vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany, hit.normal)));
-		//Neps = Neps.normalize();
-		//Neps = Neps / / kicsinyitesNagysaga;
+		if (hit.material->isRefractive()) {
+			vec3 refractionDir = hit.material->refract(ray._nezetiIrany, hit.normal);
+			vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany * -1.0f, hit.normal)));
+			Neps = Neps.normalize();
+			Neps = Neps / kicsinyitesNagysaga;
 
-		//	Ray refractedRay(hit.position - Neps, refractionDir);
+			Ray refractedRay(hit.position - Neps, refractionDir);
 
-		//	vec3 fresnel = hit.material->Fresnel(ray._nezetiIrany, hit.normal);
-		//	outRadiance = outRadiance + trace(refractedRay)*(vec3(1, 1, 1) - fresnel);
-		//}
+			vec3 fresnel = hit.material->Fresnel(ray._nezetiIrany, hit.normal);
+			fresnel = (vec3(1, 1, 1) - fresnel);
+			outRadiance = outRadiance + trace(refractedRay,depth + 1)*fresnel;
+		}
 	}
 
 	color_normalize(outRadiance);

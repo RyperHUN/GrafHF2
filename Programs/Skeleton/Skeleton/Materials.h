@@ -35,7 +35,7 @@ struct Material
 
 		return inDir - normal * (dot(normal, inDir) * 2.0f);
 	}
-	//virtual vec3 refract(vec3 &inDir, vec3 &normal);
+	vec3 refract(vec3 &inDir, vec3 &normal) { return vec3(0, 0, 0); }
 
 	virtual void calcF0() {}
 
@@ -86,13 +86,17 @@ public:
 		{
 			inDir = inDir.normalize();
 			normal = normal.normalize();
-			throw "vec3::refract() - Csak normalizalt vektorral mukodik a visszaverodes";
 		}
 
 		return inDir - normal * dot(normal, inDir) * 2.0f;
 	}
 	///TODO egyellore csak 1 n el mûködik
 	vec3 refract(vec3 inDir, vec3 normal) {
+		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
+		{
+			inDir = inDir.normalize();
+			normal = normal.normalize();
+		}
 		float ior = n.x;
 		float cosa = -dot(normal, inDir);
 		if (cosa < 0) 
