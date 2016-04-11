@@ -3,6 +3,9 @@
 #include "Materials.h"
 #include "VectorMath.h"
 #include "RayLogic_Hit.h"
+#include <iostream>
+
+const float HULLAMNAGYSAGA = 0.05f;
 
 struct Intersectable
 {
@@ -443,4 +446,71 @@ public:
 			points[i] = skalazMatrix * points[i];
 		}
 	}
+};
+
+class Water : public Intersectable
+{
+
+public:
+	Rectanglef* VizHullamTeteje;
+	Rectanglef* VizHullamAlja;
+	Water(Rectanglef* VizHullamTeteje, Rectanglef* VizHullamAlja,Material* material)
+	{
+		this->VizHullamAlja = VizHullamAlja;
+		this->VizHullamTeteje = VizHullamTeteje;
+		this->material = material;
+	}
+	//Ez a hullam.
+	float f(float x, const Ray& ray)
+	{
+		//return 0.05*sin((x - 5)*(x - 5) + y*y) / (1 + (x - 5)*(x - 5) + y*y);
+		return HULLAMNAGYSAGA*sin(x);
+	}
+	///TODO Regula falsit irni
+	float Reg(double aerr, int maxitr, double a, double b, const Ray& ray)
+	{
+		int i = 0;
+		double c, prev;
+		vec3 eredmeny;
+		while (i <= maxitr)
+		{
+			if (f(a,ray) * f(b,ray) < 0)
+			{
+				c = a - ((b - a) / (f(b,ray) - f(a, ray)))*f(a, ray);
+			}
+			if (f(a, ray) * f(c, ray) < 0)
+			{
+				b = c; prev = a;
+			}
+			else
+			{
+				a = c; prev = b;
+			}
+			if (fabs(prev - c) < aerr)
+			{
+				std::cout << "Iter kesz" << i << ": x = " << c << std::endl; ///TODO Kitorol csak debugra van itt
+				return c;
+				break;
+			}
+			i++;
+		}
+	}
+	Hit intersect(const Ray& ray)
+	{
+		Hit felso = VizHullamTeteje->intersect(ray);
+		Hit also  = VizHullamAlja->intersect(ray);
+		if (felso.t > 0 && also.t > 0)
+		{
+			Hit talalat;
+			float t = Reg(0.0001f, 100, felso.t, also.t, ray);
+			float normal = 0.2f*cos(t);
+
+		}
+		
+		return Hit();
+		//if (f(a) * f(b) < 0)
+		//	Reg(aerr, maxitr, a, b);
+
+	}
+
 };

@@ -139,3 +139,4 @@ public:
 		return vec3(result.v[0], result.v[1], result.v[2]);
 	}
 };
+

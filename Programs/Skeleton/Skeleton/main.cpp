@@ -296,11 +296,11 @@ void onInitialization() {
 		medenceAlapjaPontok.push_back(vec3(1.0f, -1.0f, 0));
 	}
 	
-	vec3 medenceSkalaz(1, 1, 1);
+	vec3 medenceSkalaz(1.2f, 1, 2.0f);
 	vec3 medenceEltolas(0.2f, 0.0f, 0.2f);
 	Rectanglef* medenceAlap = new Rectanglef(medenceAlapjaPontok, medenceAnyaga);
-	medenceAlap->eltol(medenceEltolas);
-	medenceAlap->skalaz(medenceSkalaz);
+//	medenceAlap->eltol(medenceEltolas);
+//	medenceAlap->skalaz(medenceSkalaz);
 	
 	vector<vec3> medenceTetejePontok;
 	medenceTetejePontok.push_back(vec3(-1.0f, -0.5f, -1.0f));  //Teteje
@@ -308,25 +308,34 @@ void onInitialization() {
 	medenceTetejePontok.push_back(vec3(1.0f, -0.5f, 0));
 	medenceTetejePontok.push_back(vec3(1.0f, -0.5f, -1.0f));
 	Rectanglef* medenceTeteje = new Rectanglef(medenceTetejePontok, medenceAnyaga);
-	medenceTeteje->eltol(medenceEltolas);
-	medenceTeteje->skalaz(medenceSkalaz);
+//	medenceTeteje->eltol(medenceEltolas);
+//	medenceTeteje->skalaz(medenceSkalaz);
 	plane->kivag = true;
 	plane->kivagniObjektumok.push_back(medenceTeteje);
 
 	vector<vec3> vizPontok = medenceTetejePontok;
 	Rectanglef* viz = new Rectanglef(vizPontok, vizAnyaga);
-	viz->eltol(medenceEltolas);
+//	viz->eltol(medenceEltolas);
 	viz->skalaz(medenceSkalaz);
 	
+	///Medence keszites
+	Rectanglef* VizHullamTeteje = new Rectanglef(medenceTetejePontok, roughAnyag);
+	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA, 0));
+
+	Rectanglef* VizHullamAlja = new Rectanglef(medenceTetejePontok, roughAnyag);
+	VizHullamAlja->eltol(vec3(0, -HULLAMNAGYSAGA, 0));
+
+	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja, roughAnyag);
 
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
-	objects.push_back(ellipsoid);
+	//objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidViz);
 	objects.push_back(ellipsoidArany);
-	objects.push_back(ellipsoidEzust);
+	//objects.push_back(ellipsoidEzust);
 	//objects.push_back(medence);
 	objects.push_back(medenceAlap);
-	objects.push_back(viz);
+	objects.push_back(hullamzoViz);
+	//objects.push_back(viz);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();
