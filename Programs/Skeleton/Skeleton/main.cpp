@@ -225,9 +225,13 @@ struct Scene
 	///TODO atnezni parametrizalni
 	void setCamera()
 	{
-		camera.eyePosition = vec3(0, 0, 1);
-		camera.planePosition = vec3(0, 0, -1);
-		camera.right = vec3(1, 0, 0);
+		//Old view
+		//camera.eyePosition = vec3(0, 0, 1);
+		//camera.planePosition = vec3(0, 0, -1);
+		//camera.right = vec3(1, 0, 0);
+		camera.eyePosition = vec3(0, 0.7f, 0.7f);
+		camera.planePosition = vec3(0, -0.5f, -0.5f);
+		camera.right = vec3(0.707104f, 0, 0);
 		camera.up = cross(camera.right,camera.planePosition);
 	}
 	void setLight()
@@ -334,7 +338,7 @@ void onInitialization() {
 	//objects.push_back(ellipsoidEzust);
 	//objects.push_back(medence);
 	objects.push_back(medenceAlap);
-	objects.push_back(hullamzoViz);
+//	objects.push_back(hullamzoViz);
 	//objects.push_back(viz);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);

@@ -5,7 +5,7 @@
 #include "RayLogic_Hit.h"
 #include <iostream>
 
-const float HULLAMNAGYSAGA = 0.05f;
+const float HULLAMNAGYSAGA = 0.1f;
 
 struct Intersectable
 {
@@ -470,7 +470,8 @@ public:
 	float Reg(double aerr, int maxitr, double a, double b, const Ray& ray)
 	{
 		int i = 0;
-		double c, prev;
+		double c = 0;
+		double prev = 0;
 		vec3 eredmeny;
 		while (i <= maxitr)
 		{
@@ -502,6 +503,8 @@ public:
 		if (felso.t > 0 && also.t > 0)
 		{
 			Hit talalat;
+			float fa = f(also.t,ray);
+			float fb = f(felso.t,ray);
 			float t = Reg(0.0001f, 100, felso.t, also.t, ray);
 			float normal = 0.2f*cos(t);
 
