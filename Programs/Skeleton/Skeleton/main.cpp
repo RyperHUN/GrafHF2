@@ -210,7 +210,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 282 && y >= windowHeight - 411)
+				if (x >= 320 && y >= windowHeight - 395)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -226,12 +226,12 @@ struct Scene
 	void setCamera()
 	{
 		//Old view
-		camera.eyePosition = vec3(0, 0, 1);
-		camera.planePosition = vec3(0, 0, -1);
-		camera.right = vec3(1, 0, 0);
-		//camera.eyePosition = vec3(0, 3, 2.0f);
-		//camera.planePosition = vec3(0, -0.5f, -0.5f);
-		//camera.right = vec3(0.707104f, 0, 0);
+		//camera.eyePosition = vec3(0, 0, 1);
+		//camera.planePosition = vec3(0, 0, -1);
+		//camera.right = vec3(1, 0, 0);
+		camera.eyePosition = vec3(0, 3, 2.0f);
+		camera.planePosition = vec3(0, -0.5f, -0.5f);
+		camera.right = vec3(0.707104f, 0, 0);
 		camera.up = cross(camera.right,camera.planePosition);
 	}
 	void setLight()
@@ -324,10 +324,10 @@ void onInitialization() {
 	
 	///Medence keszites
 	Rectanglef* VizHullamTeteje = new Rectanglef(medenceTetejePontok, roughAnyag);
-	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA, 0));
+	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA + 0.5f, 0));
 
 	Rectanglef* VizHullamAlja = new Rectanglef(medenceTetejePontok, roughAnyag);
-	VizHullamAlja->eltol(vec3(0, -HULLAMNAGYSAGA, 0));
+	VizHullamAlja->eltol(vec3(0, -HULLAMNAGYSAGA + 0.5f, 0));
 
 	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja, roughAnyag);
 
@@ -336,8 +336,10 @@ void onInitialization() {
 	//objects.push_back(ellipsoidViz);
 	objects.push_back(ellipsoidArany);
 	//objects.push_back(ellipsoidEzust);
-	objects.push_back(medenceAlap);
+	//objects.push_back(medenceAlap);
 	objects.push_back(hullamzoViz);
+	//objects.push_back(VizHullamAlja);
+	//objects.push_back(VizHullamTeteje);
 	//objects.push_back(viz);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);

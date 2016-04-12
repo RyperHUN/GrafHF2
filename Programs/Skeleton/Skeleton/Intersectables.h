@@ -484,7 +484,8 @@ public:
 		//return HULLAMNAGYSAGA*(cos(sqrt(powf((p0x + vx*t - x0),2) + powf((p0y + vy*t - z0), 2))) - p0z + vz*t) - HullamY;
 		float kiszamolt = HULLAMNAGYSAGA*(cos(X + Z) - Y);
 		kiszamolt = kiszamolt + HullamY;
-		return kiszamolt;
+		float kiszamolt2 = HULLAMNAGYSAGA*( (sin(X*X + Z*Z) / (1 + X*X + Z*Z) + sin((X - 5)*(X - 5) + Z*Z) / (1 + (X - 5)*(X - 5) + Z*Z) ) - Y);
+		return kiszamolt2;
 	}
 	///TODO Regula falsit irni
 	float Reg(double aerr, int maxitr, double a, double b, const Ray& ray)
@@ -528,7 +529,8 @@ public:
 			if (fa* fb < 0)
 				float t = Reg(0.0001f, 100, felso.t, also.t, ray);
 			else
-				throw "Elrontott szamok Regula falsi";
+				return Hit();
+				//throw "Elrontott szamok Regula falsi";
 			//float normal = 0.2f*cos(t);
 
 		}
