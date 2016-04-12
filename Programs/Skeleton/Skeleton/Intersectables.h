@@ -5,7 +5,7 @@
 #include "RayLogic_Hit.h"
 #include <iostream>
 
-const float HULLAMNAGYSAGA = 0.1f;
+
 
 struct Intersectable
 {
@@ -448,7 +448,7 @@ public:
 		}
 	}
 };
-
+const float HULLAMNAGYSAGA = 0.3f;
 class Water : public Intersectable
 {
 
@@ -482,10 +482,10 @@ public:
 		float Z = p0z + vz*t;
 		float Y = (p0y + vy*t);
 		//return HULLAMNAGYSAGA*(cos(sqrt(powf((p0x + vx*t - x0),2) + powf((p0y + vy*t - z0), 2))) - p0z + vz*t) - HullamY;
-		float kiszamolt = HULLAMNAGYSAGA*(cos(X + Z) - Y);
+		float kiszamolt = HULLAMNAGYSAGA*(0.1*(sin(X*X + Z*Z) / (1 + X*X + Z*Z))) - Y;
 		kiszamolt = kiszamolt + HullamY;
-		float kiszamolt2 = HULLAMNAGYSAGA*( (sin(X*X + Z*Z) / (1 + X*X + Z*Z) + sin((X - 5)*(X - 5) + Z*Z) / (1 + (X - 5)*(X - 5) + Z*Z) ) - Y);
-		return kiszamolt2;
+		//float kiszamolt2 = HULLAMNAGYSAGA*(sin(X*X + Z*Z) / (1 + X*X + Z*Z) + sin((X - 5)*(X - 5) + Z*Z) / (1 + (X - 5)*(X - 5) + Z*Z) ) - Y;
+		return kiszamolt;
 	}
 	///TODO Regula falsit irni
 	float Reg(double aerr, int maxitr, double a, double b, const Ray& ray)
@@ -510,7 +510,7 @@ public:
 			}
 			if (fabs(prev - c) < aerr)
 			{
-				std::cout << "Iter kesz" << i << ": x = " << c << std::endl; ///TODO Kitorol csak debugra van itt
+				//std::cout << "Iter kesz" << i << ": x = " << c << std::endl; ///TODO Kitorol csak debugra van itt
 				return c;
 				break;
 			}
@@ -527,10 +527,38 @@ public:
 			float fa = f(also.t,ray);
 			float fb = f(felso.t,ray);
 			if (fa* fb < 0)
-				float t = Reg(0.0001f, 100, felso.t, also.t, ray);
+			{
+				float t = Reg(0.0000001f, 10000, felso.t, also.t, ray);
+				talalat.t = t;
+
+				float p0x = ray._kozeppont.x;
+				float p0y = ray._kozeppont.y;
+				float p0z = ray._kozeppont.z;
+
+				float vx = ray._nezetiIrany.x;
+				float vy = ray._nezetiIrany.y;
+				float vz = ray._nezetiIrany.z;
+
+				float x0 = 0; // Hzllam kezdo pos
+				float z0 = 0;
+
+				float X = p0x + vx*t;
+				float Z = p0z + vz*t;
+				float Y = (p0y + vy*t);
+
+				float normalx = (X* (2 * HULLAMNAGYSAGA *(X*X + Z*Z + 1) *cos(X*X + Z*Z) - 2 * HULLAMNAGYSAGA* sin(X*X + Z*Z))) / ((X*X + Z*Z + 1)*(X*X + Z*Z + 1));
+				float normalZ = (Z* (2 * HULLAMNAGYSAGA * (X*X + Z*Z + 1)* cos(X*X + Z*Z) - 2 * HULLAMNAGYSAGA * sin(X*X + Z*Z))) / ((X*X + Z*Z + 1)*(X*X + Z*Z + 1));
+				float normalY = vy * -1.0f;
+				talalat.normal = vec3(normalx, normalY, normalZ);
+				talalat.position = vec3(X, Y, Z);
+			}
 			else
-				return Hit();
-				//throw "Elrontott szamok Regula falsi";
+				throw "Elrontott szamok Regula falsi";
+
+			
+			
+			talalat.material = material;
+			return talalat;
 			//float normal = 0.2f*cos(t);
 
 		}

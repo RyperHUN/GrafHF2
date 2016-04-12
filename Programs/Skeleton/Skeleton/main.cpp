@@ -229,7 +229,7 @@ struct Scene
 		//camera.eyePosition = vec3(0, 0, 1);
 		//camera.planePosition = vec3(0, 0, -1);
 		//camera.right = vec3(1, 0, 0);
-		camera.eyePosition = vec3(0, 3, 2.0f);
+		camera.eyePosition = vec3(0, 2.5, 1.5f);
 		camera.planePosition = vec3(0, -0.5f, -0.5f);
 		camera.right = vec3(0.707104f, 0, 0);
 		camera.up = cross(camera.right,camera.planePosition);
@@ -325,18 +325,20 @@ void onInitialization() {
 	///Medence keszites
 	Rectanglef* VizHullamTeteje = new Rectanglef(medenceTetejePontok, roughAnyag);
 	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA + 0.5f, 0));
+	VizHullamTeteje->skalaz(vec3(3, 1, 4));
 
 	Rectanglef* VizHullamAlja = new Rectanglef(medenceTetejePontok, roughAnyag);
 	VizHullamAlja->eltol(vec3(0, -HULLAMNAGYSAGA + 0.5f, 0));
+	VizHullamAlja->skalaz(vec3(3, 1, 4));
 
 	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja, roughAnyag);
 
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	//objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidViz);
-	objects.push_back(ellipsoidArany);
+	//objects.push_back(ellipsoidArany);
 	//objects.push_back(ellipsoidEzust);
-	//objects.push_back(medenceAlap);
+	objects.push_back(medenceAlap);
 	objects.push_back(hullamzoViz);
 	//objects.push_back(VizHullamAlja);
 	//objects.push_back(VizHullamTeteje);
