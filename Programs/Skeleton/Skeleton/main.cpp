@@ -229,7 +229,7 @@ struct Scene
 		//camera.eyePosition = vec3(0, 0, 1);
 		//camera.planePosition = vec3(0, 0, -1);
 		//camera.right = vec3(1, 0, 0);
-		camera.eyePosition = vec3(0, 2.5, 1.5f);
+		camera.eyePosition = vec3(0, 2.5f, 1.5f);
 		camera.planePosition = vec3(0, -0.5f, -0.5f);
 		camera.right = vec3(0.707104f, 0, 0);
 		camera.up = cross(camera.right,camera.planePosition);
@@ -267,8 +267,8 @@ void onInitialization() {
 	sphere3->material = ezustAnyaga;
 	Plane* plane = new Plane(vec3(0, 0, 0), vec3(0, 1, 0), fuAnyagaSik);
 	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.45f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), roughAnyag);
-	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 1.0f, -3), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
-	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(-0.4f, 0.2f, -4.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
+	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.5f, -3), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
+	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(-0.7f, 0.5f, -3.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
 	Ellipsoid* ellipsoidViz = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), vizAnyaga);
 
 	vector<vec3> medenceAlapjaPontok;
@@ -327,9 +327,9 @@ void onInitialization() {
 
 	vector<vec3> vizPontok = medenceTetejePontok;
 	Rectanglef* viz = new Rectanglef(vizPontok, vizAnyaga);
-//	viz->eltol(medenceEltolas);
-	viz->skalaz(medenceSkalaz);
-	
+	viz->material->isWater = true;
+	viz->eltol(HullamEltol);
+	viz->skalaz(HullamSkalaz);
 	///Medence keszites
 	Rectanglef* VizHullamTeteje = new Rectanglef(medenceTetejePontok, roughAnyag);
 	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA + 0.5f, 0));
@@ -340,17 +340,17 @@ void onInitialization() {
 	VizHullamAlja->skalaz(HullamSkalaz);
 
 	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja, vizAnyaga);
-
+	hullamzoViz->material->isWater = true;
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	//objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidViz);
 	objects.push_back(ellipsoidArany);
-	//objects.push_back(ellipsoidEzust);
+	objects.push_back(ellipsoidEzust);
 	objects.push_back(medenceAlap);
-	objects.push_back(hullamzoViz);
+	//objects.push_back(hullamzoViz);
 	//objects.push_back(VizHullamAlja);
 	//objects.push_back(VizHullamTeteje);
-	//objects.push_back(viz);
+	objects.push_back(viz);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();

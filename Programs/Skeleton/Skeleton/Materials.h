@@ -4,11 +4,13 @@
 
 struct Material
 {
+	bool isWater;
 	bool isReflect;
 	bool isRefract;
 	///TODO irni konstruktort ami alapbol mindent 0 ba rak
 	Material()
 	{
+		isWater = false;
 		isReflect = false;
 		isRefract = false;
 	}

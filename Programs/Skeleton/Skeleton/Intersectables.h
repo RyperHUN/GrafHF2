@@ -382,7 +382,11 @@ public:
 	{
 		vec3 eye = ray._kozeppont;
 		vec3 v = ray._nezetiIrany;
-
+		if (material->isWater)
+		{
+			if (v.y > 0)
+				return Hit();
+		}
 		Hit bestHit;
 		for (int i = 0; i < points.size() / 4; i++)
 		{
@@ -523,6 +527,9 @@ public:
 	{
 		Hit felso = VizHullamTeteje->intersect(ray);
 		Hit also  = VizHullamAlja->intersect(ray);
+		///TODO kikommentezni igy majd ha alúról jön a sugár akkor átengedi
+	//	if (ray._nezetiIrany.y > 0)  
+	//		return Hit();
 		if (felso.t > 0 && also.t > 0)
 		{
 			Hit talalat;
