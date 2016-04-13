@@ -448,7 +448,7 @@ public:
 		}
 	}
 };
-const float HULLAMNAGYSAGA = 0.3f;
+const float HULLAMNAGYSAGA = 0.1f;
 class Water : public Intersectable
 {
 
@@ -481,6 +481,7 @@ public:
 		float X = p0x + vx*t;
 		float Z = p0z + vz*t;
 		float Y = (p0y + vy*t);
+
 		//return HULLAMNAGYSAGA*(cos(sqrt(powf((p0x + vx*t - x0),2) + powf((p0y + vy*t - z0), 2))) - p0z + vz*t) - HullamY;
 		float kiszamolt = HULLAMNAGYSAGA*(0.1*(sin(X*X + Z*Z) / (1 + X*X + Z*Z))) - Y;
 		kiszamolt = kiszamolt + HullamY;
@@ -516,6 +517,7 @@ public:
 			}
 			i++;
 		}
+		return c;
 	}
 	Hit intersect(const Ray& ray)
 	{
@@ -528,7 +530,7 @@ public:
 			float fb = f(felso.t,ray);
 			if (fa* fb < 0)
 			{
-				float t = Reg(0.0000001f, 10000, felso.t, also.t, ray);
+				float t = Reg(0.00001f, 100, felso.t, also.t, ray);
 				talalat.t = t;
 
 				float p0x = ray._kozeppont.x;
