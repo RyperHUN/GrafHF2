@@ -210,7 +210,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 82 && y >= windowHeight - 207)
+				if (x >= 230 && y >= windowHeight - 250)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -267,8 +267,8 @@ void onInitialization() {
 	sphere3->material = ezustAnyaga;
 	Plane* plane = new Plane(vec3(0, 0, 0), vec3(0, 1, 0), fuAnyagaSik);
 	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.45f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), roughAnyag);
-	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.5f, -3), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
-	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(-0.7f, 0.5f, -3.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
+	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.6f, -3), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
+	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(-0.7f, 0.6f, -3.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
 	Ellipsoid* ellipsoidViz = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), vizAnyaga);
 
 	vector<vec3> medenceAlapjaPontok;
@@ -332,14 +332,14 @@ void onInitialization() {
 	viz->skalaz(HullamSkalaz);
 	///Medence keszites
 	Rectanglef* VizHullamTeteje = new Rectanglef(medenceTetejePontok, roughAnyag);
-	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA + 0.5f, 0));
-	VizHullamTeteje->skalaz(HullamSkalaz);
+	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA + 0.5f, 0.5f));
+	VizHullamTeteje->skalaz(HullamSkalaz + vec3(4,1,4));
 
 	Rectanglef* VizHullamAlja = new Rectanglef(medenceTetejePontok, roughAnyag);
 	VizHullamAlja->eltol(vec3(0, -HULLAMNAGYSAGA + 0.5f, 0));
 	VizHullamAlja->skalaz(HullamSkalaz);
 
-	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja, vizAnyaga);
+	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja,plane, vizAnyaga);
 	hullamzoViz->material->isWater = true;
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	//objects.push_back(ellipsoid);
@@ -347,10 +347,10 @@ void onInitialization() {
 	objects.push_back(ellipsoidArany);
 	objects.push_back(ellipsoidEzust);
 	objects.push_back(medenceAlap);
-	//objects.push_back(hullamzoViz);
+	objects.push_back(hullamzoViz);
 	//objects.push_back(VizHullamAlja);
 	//objects.push_back(VizHullamTeteje);
-	objects.push_back(viz);
+	//objects.push_back(viz);
 	vector<vec4> background;
 	background.resize(windowWidth * windowHeight);
 	background = scene.createImage();

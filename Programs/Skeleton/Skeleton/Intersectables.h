@@ -452,19 +452,21 @@ public:
 		}
 	}
 };
-const float HULLAMNAGYSAGA = 0.1f;
+const float HULLAMNAGYSAGA = 0.3f;
 class Water : public Intersectable
 {
 
 public:
 	Rectanglef* VizHullamTeteje;
 	Rectanglef* VizHullamAlja;
+	Plane* plane;
 	float HullamY;
-	Water(Rectanglef* VizHullamTeteje, Rectanglef* VizHullamAlja,Material* material)
+	Water(Rectanglef* VizHullamTeteje, Rectanglef* VizHullamAlja,Plane* plane,Material* material)
 	{
 		this->VizHullamAlja = VizHullamAlja;
 		this->VizHullamTeteje = VizHullamTeteje;
 		this->material = material;
+		this->plane = plane;
 		//Igy azt a magassagot kapom meg, ami pont a 2 db SIK kozott van
 		HullamY = VizHullamTeteje->points[0].y - HULLAMNAGYSAGA;
 	}
@@ -525,6 +527,15 @@ public:
 	}
 	Hit intersect(const Ray& ray)
 	{
+		if (material->isWater)
+		{
+			if (ray._nezetiIrany.y > 0)
+				return Hit();
+		}
+		///Elmeletileg ezzel a sorral csak azt jelenitene meg ami kivan vágva a síkból.
+		//Hit sikTalal = plane->intersect(ray);
+		//if (sikTalal.t != -1)  // Ha nincs talalat a sikkal, akkor a "MEDENCEBE " vagyok
+		//	return Hit();
 		Hit felso = VizHullamTeteje->intersect(ray);
 		Hit also  = VizHullamAlja->intersect(ray);
 		///TODO kikommentezni igy majd ha alúról jön a sugár akkor átengedi
@@ -557,7 +568,7 @@ public:
 
 				float normalx = (X* (2 * HULLAMNAGYSAGA *(X*X + Z*Z + 1) *cos(X*X + Z*Z) - 2 * HULLAMNAGYSAGA* sin(X*X + Z*Z))) / ((X*X + Z*Z + 1)*(X*X + Z*Z + 1));
 				float normalZ = (Z* (2 * HULLAMNAGYSAGA * (X*X + Z*Z + 1)* cos(X*X + Z*Z) - 2 * HULLAMNAGYSAGA * sin(X*X + Z*Z))) / ((X*X + Z*Z + 1)*(X*X + Z*Z + 1));
-				float normalY = vy * -1.0f;
+				float normalY = 1.0f;
 				talalat.normal = vec3(normalx, normalY, normalZ);
 				talalat.position = vec3(X, Y, Z);
 			}
