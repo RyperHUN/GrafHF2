@@ -25,7 +25,6 @@ public:
 	}
 	Hit intersect(const Ray& ray)
 	{
-		float EPSILON = 0; ///TODO IDE LEHET MAS KENE
 		vec3 O_C = ray._kozeppont - center;
 		vec3 dir = ray._nezetiIrany;
 		dir = dir.normalize();
@@ -53,36 +52,36 @@ public:
 		float t1 = (-b + d) / (2.f*a);
 		float t2 = (-b - d) / (2.f*a);
 
-		if (t1 <= EPSILON && t2 <= EPSILON) return Hit(); // both intersections are behind the ray origin
-		bool back = (t1 <= EPSILON || t2 <= EPSILON); // If only one intersection (t>0) then we are inside the ellipsoid and the intersection is at the back of the ellipsoid
+		if (t1 <= 0 && t2 <= 0) 
+			return Hit(); // both intersections are behind the ray origin
+
 		float t = 0.f;
-		if (t1 <= EPSILON)
+		if (t1 <= 0)
 			t = t2;
 		else
-			if (t2 <= EPSILON)
+			if (t2 <= 0)
 				t = t1;
 			else
 				t = (t1 < t2) ? t1 : t2;
 
-		if (t < EPSILON) return Hit(); // Too close to intersection
+		if (t < 0) return Hit(); // Too close to intersection
 
 		Hit talalat;
 		talalat.position = ray._kozeppont + dir*t;
 		talalat.t = t;
-		vec3 normal = talalat.position - center;
-		normal.x = 2.f*normal.x / (size.x*size.x);
-		normal.y = 2.f*normal.y / (size.y*size.y);
-		normal.z = 2.f*normal.z / (size.z*size.z);
+		vec3 normal;
+		normal.x = 2.0f*talalat.position.x-center.x / (size.x*size.x);
+		normal.y = 2.0f*talalat.position.y - center.y / (size.y*size.y);
+		normal.z = 2.0f*talalat.position.z - center.z / (size.z*size.z);
 
-		normal = (back) ? normal * -1.f : normal * 1.f;
+		//if(back)
+			//normal = (back) ? normal * -1.f : normal * 1.f;
 		normal = normal.normalize();
 		
 		talalat.normal = normal;
 		talalat.material = this->material;
 		
 		return talalat;
-		///TODO
-		/// http://cudaopencl.blogspot.hu/2012/12/ellipsoids-finally-added-to-ray-tracing.html
 	}
 };
 

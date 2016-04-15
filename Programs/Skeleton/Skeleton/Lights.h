@@ -52,7 +52,7 @@ struct DirectionLight : public Light
 
 float magic_intensity = 0.2f;
 
-vec3 napDir(20, 10, -1);
+vec3 napDir(12, 10, -1);
 //vec3 napDir(-1, -1, 0);
 DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), napDir,magic_intensity*10);
 
