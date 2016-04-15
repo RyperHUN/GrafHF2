@@ -541,7 +541,7 @@ public:
 		}
 		///Elmeletileg ezzel a sorral csak azt jelenitene meg ami kivan vágva a síkból.
 		Hit sikTalal = plane->intersect(ray);
-		if (sikTalal.t < 0)  // Ha nincs talalat a sikkal, akkor a "MEDENCEBE " vagyok
+		if (sikTalal.t > 0)  // Ha nincs talalat a sikkal, akkor a "MEDENCEBE " vagyok
 			return Hit();
 		Hit felso = VizHullamTeteje->intersect(ray);
 		Hit also  = VizHullamAlja->intersect(ray);
