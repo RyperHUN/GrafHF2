@@ -260,16 +260,22 @@ public:
 
 			vec3 p = eye + v*t;
 
-			float teszt = dot(cross((r2 - r1), (p - r1)), normal);
+			vec3 crossa = cross((r2 - r1), (p - r1));
+			float teszt = dot(crossa, normal);
 			if (teszt > 0)
 			{
-				teszt = dot(cross((r3 - r2), (p - r2)), normal);
+				vec3 oldal = (r3 - r2);
+				vec3 toPoint = (p - r2);
+				crossa = cross(oldal,toPoint );
+				teszt = dot(crossa, normal);
 				if (teszt > 0)
 				{
-					teszt = dot(cross((r4 - r3), (p - r3)), normal);
+					crossa = cross((r4 - r3), (p - r3));
+					teszt = dot(crossa, normal);
 					if (teszt > 0)
 					{
-						teszt = dot(cross((r1 - r4), (p - r4)), normal);
+						crossa = cross((r1 - r4), (p - r4));
+						teszt = dot(crossa, normal);
 						if (teszt > 0)
 						{
 							//Háromszögbe vagyunk
@@ -306,7 +312,7 @@ public:
 		}
 	}
 };
-const float HULLAMNAGYSAGA = 0.2f;
+const float HULLAMNAGYSAGA = 0.5f;
 class Water : public Intersectable
 {
 
@@ -445,6 +451,8 @@ public:
 					normalZ = ((Z - z0) * (HULLAMNAGYSAGA * 2 * (1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0))* cos((-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)) - HULLAMNAGYSAGA * 2 * sin((-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)))) / ((1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0))*(1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)));
 					normalY = 1.0f;
 				}
+				normalx = normalx * -1.0f;
+				normalZ = normalZ * -1.0f;
 				
 				talalat.normal = vec3(normalx, normalY, normalZ);
 				talalat.normal = talalat.normal.normalize();

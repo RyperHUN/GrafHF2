@@ -75,7 +75,7 @@ using namespace std;
 
 struct Camera
 {
-	vec3 eyePosition; // Szem pozició, ahonnan a kamera néz???
+	vec3 eyePosition; // Szem pozició, ahonnan a kamera néz
 	vec3 planePosition; //Megmondja merre nez a kamera, vagyis hogy mennyire van messze a "vaszon" amin a pixelek vannak
 	vec3 up;
 	vec3 right;
@@ -97,7 +97,7 @@ struct Hit;
 vector<Intersectable*> objects;
 
 Hit firstIntersect(Ray ray) {
-	Hit bestHit; ///TODO normál vektor kiszámítása
+	Hit bestHit; 
 	for (unsigned i = 0; i < objects.size(); i++)
 	{
 		Intersectable * obj = objects[i];
@@ -136,7 +136,7 @@ vec3 trace(Ray ray, int depth) {
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 
 
-	float kicsinyitesNagysaga = 15.0f;
+	float kicsinyitesNagysaga = 7.0f;
 	vec3 outRadiance = vec3(0, 0, 0);
 	if (hit.material->materialType == TYPES::Rough)
 	{
@@ -205,7 +205,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 209 && y >= windowHeight - 436)
+				if (x >= 344 && y >= windowHeight - 453)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -264,7 +264,7 @@ void onInitialization() {
 	vec3 aranypos(0.9f, 0.6f, -1.5f);
 	vec3 ezustpos(-0.8f, 0.6f, -3.0f);
 	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.45f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), roughAnyag);
-	Ellipsoid* ellipsoidArany = new Ellipsoid(aranypos, vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
+	Ellipsoid* ellipsoidArany = new Ellipsoid(aranypos, vec3(0.5f, 0.7f, 0.5f), aranyAnyaga);
 	Ellipsoid* ellipsoidEzust = new Ellipsoid(ezustpos, vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
 	Ellipsoid* ellipsoidViz = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), vizAnyaga);
 
@@ -312,9 +312,22 @@ void onInitialization() {
 		elkeszultKockaPontok.push_back(kockaCsucsok[0]);
 	}
 	Rectanglef* kockaEzust = new Rectanglef(elkeszultKockaPontok, ezustAnyaga);
-	vec3 kockaEltol(0.5f, 0.5f, 0.5f);
+	vec3 kockaEltol(0.4f, 0.7f, 0.4f);
 	kockaEzust->skalaz(kockaEltol);
-	kockaEzust->eltol(vec3(-1, 1, -1));
+	kockaEzust->eltol(vec3(-1, 0.40f, -1));
+
+	Rectanglef* MedenceKorulrakEleje = new Rectanglef(elkeszultKockaPontok, ezustAnyaga);
+	MedenceKorulrakEleje->skalaz(vec3(5, 0.9f, 0.16f));
+	MedenceKorulrakEleje->eltol(vec3 (0, -0.1f, 0.37f));
+	Rectanglef* MedenceKorulrakJobb = new Rectanglef(elkeszultKockaPontok, ezustAnyaga);
+	MedenceKorulrakJobb->skalaz(vec3 (0.4f, 0.9f, 4.15f));
+	MedenceKorulrakJobb->eltol(vec3  (2.75f, -0.2f, -1.5f));
+	Rectanglef* MedenceKorulrakHatulja = new Rectanglef(elkeszultKockaPontok, ezustAnyaga);
+	MedenceKorulrakHatulja->skalaz(vec3(5, 0.9f, 0.2f));
+	MedenceKorulrakHatulja->eltol(vec3 (0, -0.1f, -3.2f));
+	Rectanglef* MedenceKorulrakBalra = new Rectanglef(elkeszultKockaPontok, ezustAnyaga);
+	MedenceKorulrakBalra->skalaz(vec3  (0.4f, 0.9f, 4.15f));
+	MedenceKorulrakBalra->eltol(vec3   (-2.75f, -0.2f, -1.5f));
 	
 
 	vector<vec3> medenceAlapjaPontok;
@@ -378,6 +391,7 @@ void onInitialization() {
 	viz->material->isWater = true;
 	viz->eltol(HullamEltol);
 	viz->skalaz(HullamSkalaz);
+
 	///Medence keszites
 	Rectanglef* VizHullamTeteje = new Rectanglef(medenceTetejePontok, roughAnyag);
 	VizHullamTeteje->eltol(vec3(0, HULLAMNAGYSAGA + 0.5f, 0.5f));
@@ -389,14 +403,17 @@ void onInitialization() {
 
 	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja,plane, vizAnyaga,aranypos,kockaEltol);
 	hullamzoViz->material->isWater = true;
-	objects.push_back(plane); ///TODO plane bol kivagni a medencet
-	//objects.push_back(ellipsoid);
+	objects.push_back(plane); 
 	//objects.push_back(ellipsoidViz);
 	objects.push_back(ellipsoidArany);
 	//objects.push_back(ellipsoidEzust);
 	objects.push_back(kockaEzust);
 	objects.push_back(medenceAlap);
 	objects.push_back(hullamzoViz);
+	objects.push_back(MedenceKorulrakEleje);
+	objects.push_back(MedenceKorulrakJobb);
+	objects.push_back(MedenceKorulrakHatulja);
+	objects.push_back(MedenceKorulrakBalra);
 	//objects.push_back(VizHullamAlja);
 	//objects.push_back(VizHullamTeteje);
 	//objects.push_back(viz);
@@ -448,13 +465,6 @@ void onInitialization() {
 	// make this program run
 	glUseProgram(fullScreenTexturedQuad.shaderProgram);
 }
-
-///TODO KERDESEK
-// SmoothMaterial classban n ( törésmutató ) az egy float, de a háziban mind a 3 spektrumra megvan adva az n értéke.
-// A haziban megadott n/k értékek közül egyáltalán az egyik a törésmutató ( n ) a másik meg a k ( kioltási tényező ) PL: aranyozott (n/k az r,g,b hullámhosszain: 0.17/3.1) itt n[0] = 0.17, k[0] = 3.1???
-// Honnan van meg egy anyag szine? Az aranyozott dolognak adjak egy olyan attributumot hogy color és az legyen aranyhoz hasonlit??? Egyik dian se láttam colort meg ő se emlitette
-// Mi az a kd meg a ks??? Diffuz meg spekularis allando ha jól ertettemde ezt ki adja meg egy rücskös felületnél???
-// Ha jól értettem a szemet valahova el kell rakni de itt már bebonyolódtam...
 
 // Idaig modosithatod...
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
