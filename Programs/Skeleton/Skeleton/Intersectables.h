@@ -453,7 +453,7 @@ public:
 		}
 	}
 };
-const float HULLAMNAGYSAGA = 0.5f;
+const float HULLAMNAGYSAGA = 0.2f;
 class Water : public Intersectable
 {
 
@@ -494,10 +494,11 @@ public:
 		///Valahogy ha nem az origóba van a hullám akkor ki kéne belõle vonni
 		///Ez mar mukodik
 		//float kiszamolt = HULLAMNAGYSAGA*((sin(X*X + Z*Z) / (1 + X*X + Z*Z))) - Y;
-		float kiszamol_max1 = HULLAMNAGYSAGA*(sin((X - x1)*(X - x1) + (Z - z1)*(Z - z1)) / (1 + (X - x1)*(X - x1) + (Z - z1)*(Z - z1))) - Y;
-		float kiszamol_max2 = HULLAMNAGYSAGA*(sin((X - x0)*(X - x0) + (Z - z0)*(Z - z0)) / (1 + (X - x0)*(X - x0) + (Z - z0)*(Z - z0))) - Y;
-		float maxer = max(kiszamol_max1, kiszamol_max2);
-		//float kiszamolt2 = HULLAMNAGYSAGA*(sin(X*X + Z*Z) / (1 + X*X + Z*Z) + sin((X - 5)*(X - 5) + Z*Z) / (1 + (X - 5)*(X - 5) + Z*Z) ) - Y;
+			float kiszamol_max1 = HULLAMNAGYSAGA*(sin((X - x1)*(X - x1) + (Z - z1)*(Z - z1)) / (1 + (X - x1)*(X - x1) + (Z - z1)*(Z - z1))) - Y;
+			float kiszamol_max2 = HULLAMNAGYSAGA*(sin((X - x0)*(X - x0) + (Z - z0)*(Z - z0)) / (1 + (X - x0)*(X - x0) + (Z - z0)*(Z - z0))) - Y;
+			float maxer = max(kiszamol_max1, kiszamol_max2);
+		//Csak egy hullam
+		/*return HULLAMNAGYSAGA*cos(sqrt((2*X - x0)*(2*X - x0) + (2*Z - z0)*(2*Z - z0))) - Y;*/
 		return maxer;
 	}
 	///TODO Regula falsit irni
@@ -540,7 +541,7 @@ public:
 		}
 		///Elmeletileg ezzel a sorral csak azt jelenitene meg ami kivan vágva a síkból.
 		Hit sikTalal = plane->intersect(ray);
-		if (sikTalal.t != -1)  // Ha nincs talalat a sikkal, akkor a "MEDENCEBE " vagyok
+		if (sikTalal.t < 0)  // Ha nincs talalat a sikkal, akkor a "MEDENCEBE " vagyok
 			return Hit();
 		Hit felso = VizHullamTeteje->intersect(ray);
 		Hit also  = VizHullamAlja->intersect(ray);
@@ -574,6 +575,11 @@ public:
 				float normalx;
 				float normalZ;
 				float normalY;
+				//Csak 1 hullam
+				/*normalx = (-2 * HULLAMNAGYSAGA* (x0 + 2 * X) * sin(sqrtf((x0 + 2 * X)*(x0 + 2 * X) + 4 * (z0 / 2 + Z)*(z0 / 2 + Z)))) / sqrt((x0 + 2 * X)*(x0 + 2 * X) + 4 * (z0 / 2 + Z)*(z0 / 2 + Z));
+				normalZ = (-4 * HULLAMNAGYSAGA * (-z0 / 2 + Z)*sin(sqrtf((-x0 + 2 * X)*(-x0 + 2 * X) + 4 * (-z0 / 2 + Z)*(-z0 / 2 + Z)))) / sqrt((-x0 + 2 * X)*(-x0 + 2 * X) + 4 * (-z0 / 2 + Z)*(-z0 / 2 + Z));
+				normalY = 1.0f;*/
+
 				if (kiszamol_max1 > kiszamol_max2)
 				{
 					normalx = ((-x1 + X)* (HULLAMNAGYSAGA * 2 * (1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)) *cos((-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)) - HULLAMNAGYSAGA * 2 * sin((-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)))) / ((1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1))*(1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)));

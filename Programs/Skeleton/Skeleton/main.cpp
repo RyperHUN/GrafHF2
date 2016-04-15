@@ -156,9 +156,8 @@ vec3 trace(Ray ray, int depth) {
 	}
 	else if (hit.material->materialType == TYPES::Smooth)
 	{
-		///Todo megcsinalni hogy tukrozodjon az arany!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (hit.material->isReflective()) {
-			vec3 reflectionDir = hit.material->reflect(ray._nezetiIrany, hit.normal);  // Beérkezési irány, Normál vektora a felületnek
+			vec3 reflectionDir = hit.material->reflect(ray._nezetiIrany, hit.normal); 
 			
 			vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany * -1.0f, hit.normal)));
 			Neps = Neps.normalize();
@@ -169,7 +168,7 @@ vec3 trace(Ray ray, int depth) {
 
 			outRadiance = outRadiance + trace(reflectedRay,depth + 1) * fresnel;
 		}
-		///TODO ez majd viznek kell!
+		//Csak a viznek, tobbi anyag amiknek n/k ja minden hullamhosszra másfelé engedné át a sugarakat
 		if (hit.material->isRefractive()) {
 			vec3 refractionDir = hit.material->refract(ray._nezetiIrany, hit.normal);
 			vec3 Neps = hit.normal*(sgn(dot(ray._nezetiIrany * -1.0f, hit.normal)));
@@ -194,10 +193,6 @@ vec3 trace(Ray ray, int depth) {
 struct Scene
 {
 	Camera camera;
-	void addObject(Intersectable* intersectable)
-	{
-		////TODO adja hozzá object tombhoz
-	}
 	vector<vec4> createImage()
 	{
 		setCamera();
