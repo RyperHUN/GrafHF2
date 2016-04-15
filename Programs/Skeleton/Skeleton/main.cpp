@@ -136,7 +136,7 @@ vec3 trace(Ray ray, int depth) {
 		return ambiensFeny.LightColor; // nothing  //Ambiens fenyt fogja visszaadni.
 
 
-	float kicsinyitesNagysaga = 10.0f;
+	float kicsinyitesNagysaga = 15.0f;
 	vec3 outRadiance = vec3(0, 0, 0);
 	if (hit.material->materialType == TYPES::Rough)
 	{
@@ -210,7 +210,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 179 && y >= windowHeight - 116)
+				if (x >= 508 && y >= windowHeight - 289)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -322,7 +322,7 @@ void onInitialization() {
 		elkeszultKockaPontok.push_back(kockaCsucsok[1]);
 		elkeszultKockaPontok.push_back(kockaCsucsok[0]);
 	}
-	Rectanglef* kockaEzust = new Rectanglef(elkeszultKockaPontok, roughAnyag);
+	Rectanglef* kockaEzust = new Rectanglef(elkeszultKockaPontok, ezustAnyaga);
 	kockaEzust->eltol(vec3(-1, 1, -1));
 
 	vector<vec3> medenceAlapjaPontok;
@@ -342,10 +342,13 @@ void onInitialization() {
 		medenceAlapjaPontok.push_back(vec3(-1.0f, -1.0f, -1.0f));
 		medenceAlapjaPontok.push_back(vec3(-1.0f, -0.5f, -1.0f));
 
-		medenceAlapjaPontok.push_back(vec3(1.0f, -0.5f, 0)); //jobb oldala
-		medenceAlapjaPontok.push_back(vec3(1.0f, -1.0f, 0));
-		medenceAlapjaPontok.push_back(vec3(1.0f, -1.0f, -1.0f));
 		medenceAlapjaPontok.push_back(vec3(1.0f, -0.5f, -1.0f));
+		medenceAlapjaPontok.push_back(vec3(1.0f, -1.0f, -1.0f));
+		medenceAlapjaPontok.push_back(vec3(1.0f, -1.0f, 0));
+		medenceAlapjaPontok.push_back(vec3(1.0f, -0.5f, 0)); //jobb oldala
+		
+		
+		
 
 		///TODO nem jo a normálvektorja
 		medenceAlapjaPontok.push_back(vec3(-1.0f, -1.0f, 0));
@@ -359,8 +362,6 @@ void onInitialization() {
 	vec3 HullamSkalaz(3, 1, 4);
 	vec3 HullamEltol(0, -HULLAMNAGYSAGA + 0.5f, 0);
 	Rectanglef* medenceAlap = new Rectanglef(medenceAlapjaPontok, medenceAnyaga);
-//	medenceAlap->eltol(medenceEltolas);
-//	medenceAlap->skalaz(medenceSkalaz);
 	medenceAlap->eltol(HullamEltol);
 	medenceAlap->skalaz(HullamSkalaz);
 	
@@ -377,7 +378,7 @@ void onInitialization() {
 	medenceTeteje->eltol(HullamEltol);
 	medenceTeteje->skalaz(HullamSkalaz);
 
-	//plane->kivag = true;
+	plane->kivag = true;
 	plane->kivagniObjektumok.push_back(medenceTeteje);
 
 	vector<vec3> vizPontok = medenceTetejePontok;
@@ -399,10 +400,10 @@ void onInitialization() {
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	//objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidViz);
-	objects.push_back(ellipsoidArany);
+	//objects.push_back(ellipsoidArany);
 	//objects.push_back(ellipsoidEzust);
-	objects.push_back(kockaEzust);
-	//objects.push_back(medenceAlap);
+	//objects.push_back(kockaEzust);
+	objects.push_back(medenceAlap);
 	//objects.push_back(hullamzoViz);
 	//objects.push_back(VizHullamAlja);
 	//objects.push_back(VizHullamTeteje);
