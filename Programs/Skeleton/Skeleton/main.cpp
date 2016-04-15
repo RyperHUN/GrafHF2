@@ -229,9 +229,14 @@ struct Scene
 		//camera.eyePosition = vec3(0, 0, 1);
 		//camera.planePosition = vec3(0, 0, -1);
 		//camera.right = vec3(1, 0, 0);
-		camera.eyePosition = vec3(0, 2.5f, 1.5f);
-		camera.planePosition = vec3(0, -0.5f, -0.5f);
-		camera.right = vec3(0.707104f, 0, 0);
+		//Felso nezet
+		//camera.eyePosition = vec3(0, 2.5f, 1.5f);
+		//camera.planePosition = vec3(0, -0.5f, -0.5f);
+		//camera.right = vec3(0.707104f, 0, 0);
+		//Full felso
+		camera.eyePosition = vec3(0, 3.0f, -2.0f);
+		camera.planePosition = vec3(0, -1, 0);
+		camera.right = vec3(0, 0, -1);
 		camera.up = cross(camera.right,camera.planePosition);
 	}
 	void setLight()
@@ -266,9 +271,12 @@ void onInitialization() {
 	sphere2->material = roughAnyag;
 	sphere3->material = ezustAnyaga;
 	Plane* plane = new Plane(vec3(0, 0, 0), vec3(0, 1, 0), fuAnyagaSik);
+
+	vec3 aranypos(0.9f, 0.6f, -1.5f);
+	vec3 ezustpos(-0.8f, 0.6f, -3.0f);
 	Ellipsoid* ellipsoid = new Ellipsoid(vec3(-0.45f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), roughAnyag);
-	Ellipsoid* ellipsoidArany = new Ellipsoid(vec3(0.8f, 0.6f, -3), vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
-	Ellipsoid* ellipsoidEzust = new Ellipsoid(vec3(-0.7f, 0.6f, -3.0f), vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
+	Ellipsoid* ellipsoidArany = new Ellipsoid(aranypos, vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
+	Ellipsoid* ellipsoidEzust = new Ellipsoid(ezustpos, vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
 	Ellipsoid* ellipsoidViz = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), vizAnyaga);
 
 	vector<vec3> medenceAlapjaPontok;
@@ -339,7 +347,7 @@ void onInitialization() {
 	VizHullamAlja->eltol(vec3(0, -HULLAMNAGYSAGA + 0.5f, 0));
 	VizHullamAlja->skalaz(HullamSkalaz);
 
-	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja,plane, vizAnyaga);
+	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja,plane, vizAnyaga,aranypos,ezustpos);
 	hullamzoViz->material->isWater = true;
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	//objects.push_back(ellipsoid);

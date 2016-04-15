@@ -256,13 +256,13 @@ public:
 		vec3 v = ray._nezetiIrany; // -1???
 		v = v * (-1.0f);
 
-		float denom = dot(normal, v);
+		float denom = dot(normal, v); //Nagyjaból 1 irányba néz a vektor! akkor JÓ!
 		float t = -1;
 		if (denom > 1e-6) 
 		{
 			vec3 p0l0 = position - eye;
 			p0l0 = p0l0* -1;
-			t = dot(p0l0, normal) / denom;
+			t = dot(p0l0, normal) / denom; // Ez nemtudom miért adja meg a távolságot.
 			if (t < 0)
 				return Hit(); // Nincs talalat
 			Hit talalat;
@@ -461,12 +461,17 @@ public:
 	Rectanglef* VizHullamAlja;
 	Plane* plane;
 	float HullamY;
-	Water(Rectanglef* VizHullamTeteje, Rectanglef* VizHullamAlja,Plane* plane,Material* material)
+	float x0, x1, z0, z1;
+	Water(Rectanglef* VizHullamTeteje, Rectanglef* VizHullamAlja,Plane* plane,Material* material,vec3 balPos,vec3 jobbPos)
 	{
 		this->VizHullamAlja = VizHullamAlja;
 		this->VizHullamTeteje = VizHullamTeteje;
 		this->material = material;
 		this->plane = plane;
+		this->x0 = balPos.x;
+		this->x1 = jobbPos.x;
+		this->z0 = balPos.z;
+		this->z1 = jobbPos.z;
 		//Igy azt a magassagot kapom meg, ami pont a 2 db SIK kozott van
 		HullamY = VizHullamTeteje->points[0].y - HULLAMNAGYSAGA;
 	}
@@ -481,18 +486,18 @@ public:
 		float vy = ray._nezetiIrany.y;
 		float vz = ray._nezetiIrany.z;
 
-		float x0 = 0; // Hzllam kezdo pos
-		float z0 = 0;
-
 		float X = p0x + vx*t;
 		float Z = p0z + vz*t;
 		float Y = (p0y + vy*t);
 
-		//return HULLAMNAGYSAGA*(cos(sqrt(powf((p0x + vx*t - x0),2) + powf((p0y + vy*t - z0), 2))) - p0z + vz*t) - HullamY;
-		float kiszamolt = HULLAMNAGYSAGA*(0.1*(sin(X*X + Z*Z) / (1 + X*X + Z*Z))) - Y;
-		kiszamolt = kiszamolt + HullamY;
+		///Valahogy ha nem az origóba van a hullám akkor ki kéne belõle vonni
+		///Ez mar mukodik
+		//float kiszamolt = HULLAMNAGYSAGA*((sin(X*X + Z*Z) / (1 + X*X + Z*Z))) - Y;
+		float kiszamol_max1 = HULLAMNAGYSAGA*(sin((X - x1)*(X - x1) + (Z - z1)*(Z - z1)) / (1 + (X - x1)*(X - x1) + (Z - z1)*(Z - z1))) - Y;
+		float kiszamol_max2 = HULLAMNAGYSAGA*(sin((X - x0)*(X - x0) + (Z - z0)*(Z - z0)) / (1 + (X - x0)*(X - x0) + (Z - z0)*(Z - z0))) - Y;
+		float maxer = max(kiszamol_max1, kiszamol_max2);
 		//float kiszamolt2 = HULLAMNAGYSAGA*(sin(X*X + Z*Z) / (1 + X*X + Z*Z) + sin((X - 5)*(X - 5) + Z*Z) / (1 + (X - 5)*(X - 5) + Z*Z) ) - Y;
-		return kiszamolt;
+		return maxer;
 	}
 	///TODO Regula falsit irni
 	float Reg(double aerr, int maxitr, double a, double b, const Ray& ray)
@@ -529,18 +534,15 @@ public:
 	{
 		if (material->isWater)
 		{
-			if (ray._nezetiIrany.y > 0)
+			if (ray._nezetiIrany.y > 0) ///Igy ha alulrol jon a sugar atengedi
 				return Hit();
 		}
 		///Elmeletileg ezzel a sorral csak azt jelenitene meg ami kivan vágva a síkból.
-		//Hit sikTalal = plane->intersect(ray);
-		//if (sikTalal.t != -1)  // Ha nincs talalat a sikkal, akkor a "MEDENCEBE " vagyok
-		//	return Hit();
+		Hit sikTalal = plane->intersect(ray);
+		if (sikTalal.t != -1)  // Ha nincs talalat a sikkal, akkor a "MEDENCEBE " vagyok
+			return Hit();
 		Hit felso = VizHullamTeteje->intersect(ray);
 		Hit also  = VizHullamAlja->intersect(ray);
-		///TODO kikommentezni igy majd ha alúról jön a sugár akkor átengedi
-	//	if (ray._nezetiIrany.y > 0)  
-	//		return Hit();
 		if (felso.t > 0 && also.t > 0)
 		{
 			Hit talalat;
@@ -566,9 +568,24 @@ public:
 				float Z = p0z + vz*t;
 				float Y = (p0y + vy*t);
 
-				float normalx = (X* (2 * HULLAMNAGYSAGA *(X*X + Z*Z + 1) *cos(X*X + Z*Z) - 2 * HULLAMNAGYSAGA* sin(X*X + Z*Z))) / ((X*X + Z*Z + 1)*(X*X + Z*Z + 1));
-				float normalZ = (Z* (2 * HULLAMNAGYSAGA * (X*X + Z*Z + 1)* cos(X*X + Z*Z) - 2 * HULLAMNAGYSAGA * sin(X*X + Z*Z))) / ((X*X + Z*Z + 1)*(X*X + Z*Z + 1));
-				float normalY = 1.0f;
+				float kiszamol_max1 = HULLAMNAGYSAGA*(sin((X - x1)*(X - x1) + (Z - z1)*(Z - z1)) / (1 + (X - x1)*(X - x1) + (Z - z1)*(Z - z1))) - Y;
+				float kiszamol_max2 = HULLAMNAGYSAGA*(sin((X - x0)*(X - x0) + (Z - z0)*(Z - z0)) / (1 + (X - x0)*(X - x0) + (Z - z0)*(Z - z0))) - Y;
+				float normalx;
+				float normalZ;
+				float normalY;
+				if (kiszamol_max1 > kiszamol_max2)
+				{
+					normalx = ((-x1 + X)* (HULLAMNAGYSAGA * 2 * (1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)) *cos((-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)) - HULLAMNAGYSAGA * 2 * sin((-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)))) / ((1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1))*(1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)));
+					normalZ = ((Z - z1) * (HULLAMNAGYSAGA * 2 * (1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1))* cos((-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)) - HULLAMNAGYSAGA * 2 * sin((-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)))) / ((1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1))*(1 + (-x1 + X)*(-x1 + X) + (Z - z1)*(Z - z1)));
+					normalY = 1.0f;
+				}
+				else
+				{
+					normalx = ((-x0 + X)* (HULLAMNAGYSAGA * 2 * (1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)) *cos((-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)) - HULLAMNAGYSAGA * 2 * sin((-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)))) / ((1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0))*(1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)));
+					normalZ = ((Z - z0) * (HULLAMNAGYSAGA * 2 * (1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0))* cos((-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)) - HULLAMNAGYSAGA * 2 * sin((-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)))) / ((1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0))*(1 + (-x0 + X)*(-x0 + X) + (Z - z0)*(Z - z0)));
+					normalY = 1.0f;
+				}
+				
 				talalat.normal = vec3(normalx, normalY, normalZ);
 				talalat.position = vec3(X, Y, Z);
 			}
