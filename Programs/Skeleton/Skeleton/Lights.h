@@ -52,6 +52,8 @@ struct DirectionLight : public Light
 
 float magic_intensity = 0.2f;
 
-DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), vec3(10, 10, 1),magic_intensity*10);
+vec3 napDir(20, 10, -1);
+//vec3 napDir(-1, -1, 0);
+DirectionLight nap(vec3(1, 1, 1), vec3(0, 0, 0), napDir,magic_intensity*10);
 
-AmbientLight ambiensFeny(vec3(1.0f, 1.0f, 1.0f),magic_intensity); // Igy elmeletileg feher lesz
+AmbientLight ambiensFeny(vec3(0.8f, 0.8f, 1.0f),magic_intensity); // Igy elmeletileg feher lesz

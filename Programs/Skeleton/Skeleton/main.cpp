@@ -210,7 +210,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 508 && y >= windowHeight - 289)
+				if (x >= 209 && y >= windowHeight - 436)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -259,7 +259,7 @@ void onInitialization() {
 
 	SmoothMaterial* aranyAnyaga = new SmoothMaterial(AranyN, AranyK,true, false);  ///TODO felszabaditani
 	SmoothMaterial* ezustAnyaga = new SmoothMaterial(EzustN, EzustK, true, false);  ///TODO felszabaditani
-	SmoothMaterial* vizAnyaga = new SmoothMaterial(vec3(1.33f, 1.33f, 1.33f), vec3(0, 0, 0), true, true);
+	SmoothMaterial* vizAnyaga = new SmoothMaterial(vec3(1.30f, 1.30f, 1.30f), vec3(0, 0, 0), true, true);
 	RoughMaterial* roughAnyag = new RoughMaterial(vec3(0.5f, 0.2f, 0.2f), vec3(0.5f, 0.3f, 0.1f), vec3(1, 1, 1), 15, false, false);///TODO felszabaditani
 	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.0f, 0.2f, 0.1f), vec3(0.0f, 0.3f, 0.1f), vec3(0.0f, 0.2f, 0.0f), 100, false, false);///TODO felszabaditani
 	RoughMaterial* medenceAnyaga = new RoughMaterial(vec3(0.0f, 0.4f, 0.4f), vec3(0.0f, 0.2f, 0.2f), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
@@ -323,7 +323,10 @@ void onInitialization() {
 		elkeszultKockaPontok.push_back(kockaCsucsok[0]);
 	}
 	Rectanglef* kockaEzust = new Rectanglef(elkeszultKockaPontok, ezustAnyaga);
+	vec3 kockaEltol(0.5f, 0.5f, 0.5f);
+	kockaEzust->skalaz(kockaEltol);
 	kockaEzust->eltol(vec3(-1, 1, -1));
+	
 
 	vector<vec3> medenceAlapjaPontok;
 	{
@@ -395,16 +398,16 @@ void onInitialization() {
 	VizHullamAlja->eltol(vec3(0, -HULLAMNAGYSAGA + 0.5f, 0));
 	VizHullamAlja->skalaz(HullamSkalaz);
 
-	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja,plane, vizAnyaga,aranypos,ezustpos);
+	Water* hullamzoViz = new Water(VizHullamTeteje, VizHullamAlja,plane, vizAnyaga,aranypos,kockaEltol);
 	hullamzoViz->material->isWater = true;
 	objects.push_back(plane); ///TODO plane bol kivagni a medencet
 	//objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidViz);
-	//objects.push_back(ellipsoidArany);
+	objects.push_back(ellipsoidArany);
 	//objects.push_back(ellipsoidEzust);
-	//objects.push_back(kockaEzust);
+	objects.push_back(kockaEzust);
 	objects.push_back(medenceAlap);
-	//objects.push_back(hullamzoViz);
+	objects.push_back(hullamzoViz);
 	//objects.push_back(VizHullamAlja);
 	//objects.push_back(VizHullamTeteje);
 	//objects.push_back(viz);

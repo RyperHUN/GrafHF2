@@ -453,7 +453,7 @@ public:
 		}
 	}
 };
-const float HULLAMNAGYSAGA = 0.1f;
+const float HULLAMNAGYSAGA = 0.5f;
 class Water : public Intersectable
 {
 
@@ -588,6 +588,7 @@ public:
 				}
 				
 				talalat.normal = vec3(normalx, normalY, normalZ);
+				talalat.normal = talalat.normal.normalize();
 				talalat.position = vec3(X, Y, Z);
 			}
 			else
