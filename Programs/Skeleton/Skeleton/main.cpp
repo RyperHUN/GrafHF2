@@ -259,12 +259,6 @@ void onInitialization() {
 	RoughMaterial* fuAnyagaSik = new RoughMaterial(vec3(0.0f, 0.2f, 0.1f), vec3(0.0f, 0.3f, 0.1f), vec3(0.0f, 0.2f, 0.0f), 100, false, false);///TODO felszabaditani
 	RoughMaterial* medenceAnyaga = new RoughMaterial(vec3(0.0f, 0.4f, 0.4f), vec3(0.0f, 0.2f, 0.2f), vec3(1, 1, 1), 25, false, false);///TODO felszabaditani
 
-	Sphere* sphere = new Sphere(-0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
-	Sphere* sphere2 = new Sphere(+0.8f, 0, -1, 0.5f); ///TODO felszabaditani.
-	Sphere* sphere3 = new Sphere(0.0f, 0, -2.0f, 0.3f); ///TODO felszabaditani.
-	sphere->material = aranyAnyaga;
-	sphere2->material = roughAnyag;
-	sphere3->material = ezustAnyaga;
 	Plane* plane = new Plane(vec3(0, 0, 0), vec3(0, 1, 0), fuAnyagaSik);
 
 	vec3 aranypos(0.9f, 0.6f, -1.5f);

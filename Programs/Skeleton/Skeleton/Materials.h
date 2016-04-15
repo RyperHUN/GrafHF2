@@ -31,8 +31,6 @@ struct Material
 	{
 		inDir = inDir.normalize();
 		normal = normal.normalize();
-		if (inDir.Length() > 1.1f || normal.Length() > 1.1f)
-			throw "vec3::reflect() - Csak normalizalt vektorral mukodik a visszaverodes";
 
 		return inDir - normal * (dot(normal, inDir) * 2.0f);
 	}
@@ -64,13 +62,9 @@ struct Material
 //Reflection mindig kell!
 //Refraction nem mindig pl: Arany ezust NEM, de viznel igen
 //Itt a szín a Fresnel egyenletbõl lesz!!!!!!!!!!!!!!!!!!!!!!
-
-//Ennek nem kene diffuz meg spekularis komponens!
 class SmoothMaterial : public Material {
-	//vec3   F0;	// - Base class ba van!
 	vec3 n;	// n
 	vec3 k; // Ezt igazabol nem kotelezo eltarolni
-			///TODO ka attributum megadna a szinet ha ambiens feny megvilagitja
 public:
 	SmoothMaterial(vec3 nToresmutato, vec3 kKioltasiTenyezo, bool isReflect, bool isRefract)
 	{
@@ -127,10 +121,6 @@ public:
 	}
 };
 
-///TODO
-//Szin Phong-Bling modellbol lesz 
-//ka hozzadodik a komponens, akkoris ha árnyékban van
-//diffuz és spekulárishoz pedig kellenek shadowRayek
 class RoughMaterial : public Material {
 	float n, k;
 	
@@ -165,5 +155,6 @@ public:
 	vec3 refract(vec3 inDir, vec3 normal)
 	{
 		return vec3(0, 0, 0);
+		throw "Itt nem kene lennie";
 	}
 };
