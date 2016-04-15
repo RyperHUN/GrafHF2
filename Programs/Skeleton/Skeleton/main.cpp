@@ -210,7 +210,7 @@ struct Scene
 				//elkeszultKep[y * windowWidth + x] = vec4(0, 0, 0, 0); // Legyen alapbol 0 vagyis fekete
 				Ray ray = camera.GetRay(x, y);
 				vec3 vegsoSzin = vec3(0, 0, 0);
-				if (x >= 230 && y >= windowHeight - 250)
+				if (x >= 179 && y >= windowHeight - 116)
 					vegsoSzin = vec3(1, 0, 0);
 				//else
 				{
@@ -230,13 +230,13 @@ struct Scene
 		//camera.planePosition = vec3(0, 0, -1);
 		//camera.right = vec3(1, 0, 0);
 		//Felso nezet
-		//camera.eyePosition = vec3(0, 2.5f, 1.5f);
-		//camera.planePosition = vec3(0, -0.5f, -0.5f);
-		//camera.right = vec3(0.707104f, 0, 0);
+		camera.eyePosition = vec3(0, 2.5f, 1.5f);
+		camera.planePosition = vec3(0, -0.5f, -0.5f);
+		camera.right = vec3(0.707104f, 0, 0);
 		//Full felso
-		camera.eyePosition = vec3(0, 3.0f, -2.0f);
+		/*camera.eyePosition = vec3(0, 3.0f, -2.0f);
 		camera.planePosition = vec3(0, -1, 0);
-		camera.right = vec3(0, 0, -1);
+		camera.right = vec3(0, 0, -1);*/
 		camera.up = cross(camera.right,camera.planePosition);
 	}
 	void setLight()
@@ -278,6 +278,52 @@ void onInitialization() {
 	Ellipsoid* ellipsoidArany = new Ellipsoid(aranypos, vec3(0.5f, 0.5f, 0.5f), aranyAnyaga);
 	Ellipsoid* ellipsoidEzust = new Ellipsoid(ezustpos, vec3(0.5f, 0.5f, 0.5f), ezustAnyaga);
 	Ellipsoid* ellipsoidViz = new Ellipsoid(vec3(-0.3f, 0.2f, -1.2f), vec3(0.7f, 0.7f, 0.7f), vizAnyaga);
+
+
+	vector<vec3> kockaCsucsok;
+	vector<vec3> elkeszultKockaPontok;
+	{
+		kockaCsucsok.push_back(vec3(0.5f, 0.5f, 0.5f));
+		kockaCsucsok.push_back(vec3(0.5f, 0.5f, -0.5f));
+		kockaCsucsok.push_back(vec3(-0.5f, 0.5f, -0.5f));
+		kockaCsucsok.push_back(vec3(-0.5f, 0.5f, 0.5f));
+		kockaCsucsok.push_back(vec3(-0.5f, -0.5f, 0.5f));
+		kockaCsucsok.push_back(vec3(0.5f, -0.5f, 0.5f));
+		kockaCsucsok.push_back(vec3(0.5f, -0.5f, -0.5f));
+		kockaCsucsok.push_back(vec3(-0.5f, -0.5f, -0.5f));
+		//ezekbol lesz osszerakva a kocka
+		elkeszultKockaPontok.push_back(kockaCsucsok[0]); //felso;
+		elkeszultKockaPontok.push_back(kockaCsucsok[1]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[2]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[3]);
+
+		elkeszultKockaPontok.push_back(kockaCsucsok[7]); //Also
+		elkeszultKockaPontok.push_back(kockaCsucsok[6]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[5]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[4]);
+
+		elkeszultKockaPontok.push_back(kockaCsucsok[2]); //Hatso
+		elkeszultKockaPontok.push_back(kockaCsucsok[1]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[6]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[7]);
+
+		elkeszultKockaPontok.push_back(kockaCsucsok[4]); //Elso
+		elkeszultKockaPontok.push_back(kockaCsucsok[5]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[0]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[3]);
+
+		elkeszultKockaPontok.push_back(kockaCsucsok[4]); //Baloldal
+		elkeszultKockaPontok.push_back(kockaCsucsok[3]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[2]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[7]);
+
+		elkeszultKockaPontok.push_back(kockaCsucsok[5]); //jobb oldal
+		elkeszultKockaPontok.push_back(kockaCsucsok[6]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[1]);
+		elkeszultKockaPontok.push_back(kockaCsucsok[0]);
+	}
+	Rectanglef* kockaEzust = new Rectanglef(elkeszultKockaPontok, roughAnyag);
+	kockaEzust->eltol(vec3(-1, 1, -1));
 
 	vector<vec3> medenceAlapjaPontok;
 	{
@@ -330,7 +376,8 @@ void onInitialization() {
 //	medenceTeteje->skalaz(medenceSkalaz);
 	medenceTeteje->eltol(HullamEltol);
 	medenceTeteje->skalaz(HullamSkalaz);
-	plane->kivag = true;
+
+	//plane->kivag = true;
 	plane->kivagniObjektumok.push_back(medenceTeteje);
 
 	vector<vec3> vizPontok = medenceTetejePontok;
@@ -353,9 +400,10 @@ void onInitialization() {
 	//objects.push_back(ellipsoid);
 	//objects.push_back(ellipsoidViz);
 	objects.push_back(ellipsoidArany);
-	objects.push_back(ellipsoidEzust);
-	objects.push_back(medenceAlap);
-	objects.push_back(hullamzoViz);
+	//objects.push_back(ellipsoidEzust);
+	objects.push_back(kockaEzust);
+	//objects.push_back(medenceAlap);
+	//objects.push_back(hullamzoViz);
 	//objects.push_back(VizHullamAlja);
 	//objects.push_back(VizHullamTeteje);
 	//objects.push_back(viz);

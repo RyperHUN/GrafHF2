@@ -401,8 +401,9 @@ public:
 
 			if (t < 0)
 				continue; // nincs talalat
-			if (t < bestHit.t) // Ha mar van jobb talalat
-				continue;
+			if(bestHit.t != -1)
+				if (t > bestHit.t) // Ha mar van jobb talalat
+					continue;
 
 			vec3 p = eye + v*t;
 
@@ -423,7 +424,7 @@ public:
 							talalat.normal = normal.normalize();
 							talalat.t = t;
 							talalat.material = this->material;
-							talalat.position = p;
+								talalat.position = p;
 
 							bestHit = talalat;
 						}
@@ -452,7 +453,7 @@ public:
 		}
 	}
 };
-const float HULLAMNAGYSAGA = 0.3f;
+const float HULLAMNAGYSAGA = 0.1f;
 class Water : public Intersectable
 {
 
